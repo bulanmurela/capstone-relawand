@@ -1,0 +1,37 @@
+{
+  "name": "relawand-app",
+  "version": "1.0.0",
+  "description": "RelaWand IoT Web Application with React Next.js, Express.js, and MongoDB",
+  "scripts": {
+    "dev": "concurrently \"npm run server:dev\" \"npm run client:dev\"",
+    "build": "npm run client:build && npm run server:build",
+    "start": "concurrently \"npm run server:start\" \"npm run client:start\"",
+    "client:dev": "cd client && npm run dev",
+    "client:build": "cd client && npm run build",
+    "client:start": "cd client && npm start",
+    "server:dev": "cd server && npm run dev",
+    "server:build": "cd server && npm run build",
+    "server:start": "cd server && npm start",
+    "install:all": "npm install && cd client && npm install && cd ../server && npm install",
+    "clean": "rm -rf client/node_modules server/node_modules node_modules client/.next server/dist",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "setup": "npm run install:all && cp server/.env.example server/.env",
+    "setup:no-docker": "npm run install:all && cp server/.env.example server/.env && echo 'Setup complete! Please install MongoDB locally or use MongoDB Atlas.'"
+  },
+  "keywords": [
+    "iot",
+    "stm32",
+    "react",
+    "nextjs",
+    "express",
+    "mongodb",
+    "sensor-data",
+    "web-app"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}
