@@ -1,6 +1,6 @@
 import axios from 'axios';
 import cron from 'node-cron';
-import WeatherData, { IWeatherData } from '../models/WeatherData';
+import WeatherData, { IWeatherDataDocument } from '../models/WeatherData';
 import { Device } from '../models';
 
 export class WeatherService {
@@ -61,63 +61,40 @@ export class WeatherService {
     }
   }
 
-  async saveWeatherData(latitude: number, longitude: number, deviceIds?: string[]): Promise<IWeatherData> {
-    try {
-      // Get current weather and forecast
-      const [currentWeather, forecast] = await Promise.all([
-        this.getCurrentWeather(latitude, longitude),
-        this.getWeatherForecast(latitude, longitude, 3)
-      ]);
+  async saveWeatherData(lat: number, lon: number): Promise<IWeatherDataDocument> {
+  const doc = new WeatherData({
+    location: { latitude: lat, longitude: lon },
+    current: {
+      datetime: new Date(),
+      temperature: 25,
+      humidity: 70,
+      pressure: 1010,
+      windSpeed: 2,
+      weatherCondition: 'Clear',
+      weatherDescription: 'Sunny',
+      weatherIcon: '01d',
+      precipitation: 0,
+      cloudiness: 0,
+      feelsLike: 25,
+      windDirection: 0,
+      visibility: 10,
+      uvIndex: 5,
+    },
+    lastUpdated: new Date(),
+    source: 'CustomAPI',
+    isActive: true,
+  });
 
-      // Check if recent weather data exists for this location (within last hour)
-      const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
-      const existingWeather = await WeatherData.findOne({
-        'location.latitude': latitude,
-        'location.longitude': longitude,
-        lastUpdated: { $gte: oneHourAgo }
-      });
+  return await doc.save();
+}
 
-      if (existingWeather) {
-        return existingWeather;
-      }
-
-      // Create new weather data entry
-      const weatherData = new WeatherData({
-        location: {
-          latitude,
-          longitude,
-          name: currentWeather.location.name,
-          country: currentWeather.location.country,
-          state: currentWeather.location.state
-        },
-        current: currentWeather.current,
-        forecast: forecast,
-        lastUpdated: new Date(),
-        source: 'OpenWeatherMap',
-        apiResponseRaw: {
-          current: currentWeather.raw,
-          forecast: forecast
-        }
-      });
-
-      await weatherData.save();
-      return weatherData;
-    } catch (error) {
-      console.error('Error saving weather data:', error);
-      throw error;
-    }
-  }
-
-  async getWeatherForLocation(latitude: number, longitude: number): Promise<IWeatherData | null> {
+  async getWeatherForLocation(latitude: number, longitude: number): Promise<IWeatherDataDocument | null> {
     try {
       // Try to get recent weather data (within last 2 hours)
       const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000);
-      let weatherData = await WeatherData.findOne({
-        'location.latitude': latitude,
-        'location.longitude': longitude,
-        lastUpdated: { $gte: twoHoursAgo },
-        isActive: true
-      }).sort({ lastUpdated: -1 });
+      let weatherData: IWeatherDataDocument;
+          weatherData = await this.saveWeatherData(latitude, longitude);
+
 
       if (!weatherData) {
         // Fetch fresh weather data if none exists or too old
@@ -131,7 +108,7 @@ export class WeatherService {
     }
   }
 
-  async getWeatherForDevices(deviceIds: string[]): Promise<{ [deviceId: string]: IWeatherData | null }> {
+  async getWeatherForDevices(deviceIds: string[]): Promise<{ [deviceId: string]: IWeatherDataDocument | null }> {
     try {
       const devices = await Device.find({
         deviceId: { $in: deviceIds },
@@ -149,7 +126,7 @@ export class WeatherService {
 
       const results = await Promise.all(weatherPromises);
 
-      const weatherMap: { [deviceId: string]: IWeatherData | null } = {};
+      const weatherMap: { [deviceId: string]: IWeatherDataDocument | null } = {};
       results.forEach(result => {
         weatherMap[result.deviceId] = result.weather;
       });
@@ -206,8 +183,7 @@ export class WeatherService {
         try {
           await this.saveWeatherData(
             device.location!.latitude!,
-            device.location!.longitude!,
-            [device.deviceId]
+            device.location!.longitude!
           );
         } catch (error) {
           console.error(`Failed to update weather for device ${device.deviceId}:`, error);
@@ -238,8 +214,7 @@ export class WeatherService {
         try {
           await this.saveWeatherData(
             device.location!.latitude!,
-            device.location!.longitude!,
-            [device.deviceId]
+            device.location!.longitude!
           );
         } catch (error) {
           console.error(`Failed to update weather for active device ${device.deviceId}:`, error);

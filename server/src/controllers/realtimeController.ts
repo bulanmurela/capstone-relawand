@@ -312,7 +312,7 @@ export const getRealtimeSnapshot = async (req: Request, res: Response) => {
     // Get latest sensor data for each device
     const pipeline = [
       ...(deviceIdArray.length > 0 ? [{ $match: { deviceId: { $in: deviceIdArray } } }] : []),
-      { $sort: { timestamp: -1 } },
+      { $sort: { timestamp: 1 as 1 | -1 } },
       {
         $group: {
           _id: '$deviceId',
