@@ -14,6 +14,8 @@ export interface ISensorData extends Document {
   energy?: number;
   frequency?: number;
   powerFactor?: number;
+  dht?: any;
+  mq?: any;
   rawData?: any;
   location?: {
     latitude?: number;
@@ -26,6 +28,7 @@ export interface ISensorData extends Document {
     signalStrength?: number;
     [key: string]: any;
   };
+  userId: mongoose.Types.ObjectId;
 }
 
 const SensorDataSchema: Schema = new Schema({
@@ -86,6 +89,12 @@ const SensorDataSchema: Schema = new Schema({
     min: 0,
     max: 1
   },
+  dht: {
+    type: Schema.Types.Mixed
+  },
+  mq: {
+    type: Schema.Types.Mixed
+  },
   rawData: {
     type: Schema.Types.Mixed
   },
@@ -116,6 +125,11 @@ const SensorDataSchema: Schema = new Schema({
       min: -120,
       max: 0
     }
+  },
+  userId: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
   }
 }, {
   timestamps: true
