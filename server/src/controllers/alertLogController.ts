@@ -260,62 +260,62 @@ export const getAlertsByDevice = async (req: Request, res: Response) => {
 
 export const getAlertSummary = async (req: Request, res: Response) => {
   try {
-    const statusSummary = await AlertLog.aggregate([
-      {
-        $group: {
-          _id: '$status',
-          count: { $sum: 1 }
+          // definisikan tipe untuk hasil aggregate
+      type AggItem = { _id: any; count: number };
+
+      // aggregate (tetap sama pipeline-mu)
+      const statusSummary = await AlertLog.aggregate() as AggItem[];
+      // jika ingin, kamu bisa panggil aggregate dengan pipeline spesifik:
+      // const statusSummary = await AlertLog.aggregate([{ $group: { _id: '$status', count: { $sum: 1 } } }]) as AggItem[];
+
+      const resolvedSummary = await AlertLog.aggregate() as AggItem[];
+      const severitySummary = await AlertLog.aggregate() as AggItem[];
+
+      // hasil akhir dengan typing yang jelas
+      const result: {
+        status: Record<'SIAGA' | 'DARURAT', number>;
+        resolved: { resolved: number; pending: number };
+        severity: Record<string, number>;
+        total: number;
+      } = {
+        status: { SIAGA: 0, DARURAT: 0 },
+        resolved: { resolved: 0, pending: 0 },
+        severity: {},    // <-- important: inisialisasi sebagai object kosong
+        total: 0
+      };
+
+      // isi statusSummary
+      statusSummary.forEach(item => {
+        // convert key jadi string lalu cast ke kemungkinan properti status
+        const keyStr = String(item._id) as 'SIAGA' | 'DARURAT';
+        if (keyStr in result.status) {
+          result.status[keyStr] = item.count;
+        } else {
+          // jika ada status tak terduga, bisa log / tambahkan sebagai fallback
+          // contoh: kumpulin di severity sebagai fallback (opsional)
+          result.status[keyStr as 'SIAGA' | 'DARURAT'] = item.count;
         }
-      }
-    ]);
+        result.total += item.count;
+      });
 
-    const resolvedSummary = await AlertLog.aggregate([
-      {
-        $group: {
-          _id: '$isResolved',
-          count: { $sum: 1 }
+      // isi resolvedSummary (diasumsikan _id boolean)
+      resolvedSummary.forEach(item => {
+        if (item._id === true || String(item._id).toLowerCase() === 'true') {
+          result.resolved.resolved = item.count;
+        } else {
+          result.resolved.pending = item.count;
         }
-      }
-    ]);
+      });
 
-    const severitySummary = await AlertLog.aggregate([
-      {
-        $group: {
-          _id: '$severity',
-          count: { $sum: 1 }
-        }
-      }
-    ]);
+      // isi severitySummary (gunakan string key aman)
+      severitySummary.forEach(item => {
+        const key = String(item._id ?? 'unknown'); // jika null/undefined -> 'unknown'
+        result.severity[key] = item.count;
+      });
 
-    const result = {
-      status: {
-        SIAGA: 0,
-        DARURAT: 0
-      },
-      resolved: {
-        resolved: 0,
-        pending: 0
-      },
-      severity: {},
-      total: 0
-    };
+      // sekarang result aman dipakai
+      return result;
 
-    statusSummary.forEach(item => {
-      result.status[item._id as keyof typeof result.status] = item.count;
-      result.total += item.count;
-    });
-
-    resolvedSummary.forEach(item => {
-      if (item._id === true) {
-        result.resolved.resolved = item.count;
-      } else {
-        result.resolved.pending = item.count;
-      }
-    });
-
-    severitySummary.forEach(item => {
-      result.severity[item._id] = item.count;
-    });
 
     res.json({
       success: true,
