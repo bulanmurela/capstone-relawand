@@ -19,7 +19,7 @@ const initDatabase = async () => {
     await LocationData.deleteMany({});
     console.log('🧹 Cleared existing data');
 
-    const sampleUser = await User.create({
+    const adminUser = await User.create({
       username: 'admin',
       email: 'admin@relawand.com',
       password: 'admin123',
@@ -28,14 +28,14 @@ const initDatabase = async () => {
       role: 'admin'
     });
 
-    const normalUser = await User.create({
-      username: 'user1',
-      email: 'user1@relawand.com',
-      password: 'user123',
-      firstName: 'John',
-      lastName: 'Doe',
-      role: 'user'
-    });
+    // const normalUser = await User.create({
+    //   username: 'user1',
+    //   email: 'user1@relawand.com',
+    //   password: 'user123',
+    //   firstName: 'John',
+    //   lastName: 'Doe',
+    //   role: 'user'
+    // });
 
     console.log('👤 Created sample users');
 
@@ -53,7 +53,7 @@ const initDatabase = async () => {
       firmwareVersion: '1.2.3',
       batteryLevel: 85,
       signalStrength: -65,
-      userId: sampleUser._id
+      userId: adminUser._id
     });
 
     const device2 = await Device.create({
@@ -70,7 +70,7 @@ const initDatabase = async () => {
       firmwareVersion: '1.2.2',
       batteryLevel: 45,
       signalStrength: -75,
-      userId: normalUser._id
+      userId: adminUser._id
     });
 
     const device3 = await Device.create({
@@ -87,7 +87,7 @@ const initDatabase = async () => {
       firmwareVersion: '1.2.1',
       batteryLevel: 20,
       signalStrength: -85,
-      userId: sampleUser._id
+      userId: adminUser._id
     });
 
     console.log('📱 Created sample devices');
@@ -115,7 +115,7 @@ const initDatabase = async () => {
         batteryLevel: 85,
         signalStrength: -65
       },
-      userId: sampleUser._id
+      userId: adminUser._id
     });
 
     await SensorData.create({
@@ -128,7 +128,7 @@ const initDatabase = async () => {
       current: 0.14,
       dht: { temperature: 27.8, humidity: 68.1 },
       mq: { gasLevel: 145, ppm: 11.8 },
-      userId: sampleUser._id
+      userId: adminUser._id
     });
 
     await SensorData.create({
@@ -141,7 +141,7 @@ const initDatabase = async () => {
       current: 0.12,
       dht: { temperature: 35.2, humidity: 45.3 },
       mq: { gasLevel: 280, ppm: 25.6 },
-      userId: normalUser._id
+      userId: adminUser._id
     });
 
     console.log('📊 Created sample sensor data');
@@ -163,7 +163,7 @@ const initDatabase = async () => {
       },
       alertTime: oneHourAgo,
       severity: 6,
-      userId: sampleUser._id
+      userId: adminUser._id
     });
 
     const alertLog2 = await AlertLog.create({
@@ -184,7 +184,7 @@ const initDatabase = async () => {
       },
       alertTime: twoHoursAgo,
       severity: 9,
-      userId: normalUser._id
+      userId: adminUser._id
     });
 
     console.log('🚨 Created sample alert logs');
@@ -198,7 +198,7 @@ const initDatabase = async () => {
       mimeType: 'image/jpeg',
       triggeredBy: 'manual',
       captureTime: now,
-      userId: sampleUser._id,
+      userId: adminUser._id,
       metadata: {
         resolution: '1920x1080',
         quality: 85
@@ -215,7 +215,7 @@ const initDatabase = async () => {
       triggeredBy: 'alert',
       captureTime: twoHoursAgo,
       alertId: alertLog2._id,
-      userId: normalUser._id,
+      userId: adminUser._id,
       metadata: {
         resolution: '1920x1080',
         quality: 80
@@ -232,7 +232,7 @@ const initDatabase = async () => {
       triggeredBy: 'scheduled',
       captureTime: new Date(now.getTime() - 4 * 60 * 60 * 1000),
       scheduledTime: new Date(now.getTime() - 4 * 60 * 60 * 1000),
-      userId: sampleUser._id,
+      userId: adminUser._id,
       metadata: {
         resolution: '1920x1080',
         quality: 75
