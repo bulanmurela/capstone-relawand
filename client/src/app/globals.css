@@ -1,6 +1,8 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
 
 :root {
   --background: #ffffff;
@@ -43,14 +45,26 @@
   --ring: #60a5fa;
 }
 
+/* src/app/globals.css */
 * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
   border-color: hsl(var(--border));
 }
 
 body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
   background-color: hsl(var(--background));
   color: hsl(var(--foreground));
   font-family: 'Inter', system-ui, sans-serif;
+}
+
+html {
+  margin: 0;
+  padding: 0;
 }
 
 /* Custom scrollbar */
