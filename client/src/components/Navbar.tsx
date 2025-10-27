@@ -8,7 +8,7 @@ export default function Navbar() {
   const pathname = usePathname();
 
   const navItems = [
-    { name: 'Beranda', path: '/homepage' },
+    { name: 'Beranda', path: '/beranda' },
     { name: 'Grafik Pemantauan', path: '/grafik-pemantauan' },
     { name: 'Histori Peringatan', path: '/histori-alert' },
     { name: 'Profil', path: '/profil' },
