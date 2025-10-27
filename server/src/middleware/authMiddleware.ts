@@ -1,24 +1,18 @@
-// src/middleware.ts
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
+// server/src/middlewares/authMiddleware.ts
+import { Request, Response, NextFunction } from 'express';
 
-export function middleware(request: NextRequest) {
-  const token = request.cookies.get('auth-token')?.value;
-  const { pathname } = request.nextUrl;
+export const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
+  const token = req.cookies['auth-token'];
 
-  // Jika belum login dan bukan di halaman login, redirect ke login
-  if (!token && pathname !== '/login') {
-    return NextResponse.redirect(new URL('/login', request.url));
+  if (!token) {
+    return res.status(401).json({
+      success: false,
+      message: 'Unauthorized: No token provided'
+    });
   }
 
-  // Jika sudah login dan di halaman login, redirect ke beranda
-  if (token && pathname === '/login') {
-    return NextResponse.redirect(new URL('/beranda', request.url));
-  }
-
-  return NextResponse.next();
-}
-
-export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
+  // Validasi token (simplified)
+  // In production, verify JWT token here
+  
+  next();
 };
