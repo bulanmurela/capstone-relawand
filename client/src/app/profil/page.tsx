@@ -16,42 +16,41 @@ export default function ProfileContainer() {
   useEffect(() => {
     setMounted(true);
 
-    // Check if user is logged in
-    const token = document.cookie.includes('auth-token');
-    if (!token) {
-      window.location.href = '/login';
-      return;
-    }
-
-    // Get user data from cookie
-    const getUserData = () => {
-      const cookies = document.cookie.split(';');
-      const userDataCookie = cookies.find(c => c.trim().startsWith('user-data='));
-
-      if (!userDataCookie) return null;
-
+    // Check authentication with backend
+    const checkAuth = async () => {
       try {
-        const data = userDataCookie.split('=')[1];
-        return JSON.parse(decodeURIComponent(data));
-      } catch {
-        return null;
+        const response = await fetch('http://localhost:5000/login/check', {
+          method: 'GET',
+          credentials: 'include',
+        });
+
+        const data = await response.json();
+
+        if (!data.authenticated) {
+          window.location.href = '/login';
+          return;
+        }
+
+        // Set user data from response
+        if (data.user) {
+          setUserData(data.user);
+        }
+      } catch (error) {
+        console.error('Auth check failed:', error);
+        window.location.href = '/login';
       }
     };
 
-    const data = getUserData();
-    if (data) {
-      setUserData(data);
-    }
+    checkAuth();
   }, []);
 
   const handleLogout = async () => {
     setIsLoading(true);
 
     try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-      await fetch(`${API_URL}/api/login/logout`, {
+      await fetch('http://localhost:5000/login/logout', {
         method: 'POST',
-        credentials: 'include' // Important: Include cookies in cross-origin requests
+        credentials: 'include'
       });
 
       // Redirect to login page

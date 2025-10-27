@@ -17,33 +17,32 @@ export default function Beranda() {
   useEffect(() => {
     setMounted(true);
 
-    // Check if user is logged in
-    const token = document.cookie.includes('auth-token');
-
-    if (!token) {
-      router.push('/login');
-      return;
-    }
-
-    // Get user data from cookie
-    const getUserData = () => {
-      const cookies = document.cookie.split(';');
-      const userDataCookie = cookies.find(c => c.trim().startsWith('user-data='));
-
-      if (!userDataCookie) return null;
-
+    // Check authentication with backend
+    const checkAuth = async () => {
       try {
-        const data = userDataCookie.split('=')[1];
-        return JSON.parse(decodeURIComponent(data));
-      } catch {
-        return null;
+        const response = await fetch('http://localhost:5000/login/check', {
+          method: 'GET',
+          credentials: 'include',
+        });
+
+        const data = await response.json();
+
+        if (!data.authenticated) {
+          router.push('/login');
+          return;
+        }
+
+        // Set user data from response
+        if (data.user) {
+          setUserData(data.user);
+        }
+      } catch (error) {
+        console.error('Auth check failed:', error);
+        router.push('/login');
       }
     };
 
-    const data = getUserData();
-    if (data) {
-      setUserData(data);
-    }
+    checkAuth();
   }, [router]);
 
   if (!mounted) {
