@@ -50,7 +50,7 @@ app.use('/api/hardware', hardwareRoutes);
 app.use('/api/weather', weatherRoutes);
 app.use('/api/maps', mapsRoutes);
 app.use('/api/realtime', realtimeRoutes);
-app.use("/api/login", loginRoute);
+app.use('/login', loginRoute);
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'RelaWand API is running' });

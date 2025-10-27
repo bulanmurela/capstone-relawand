@@ -12,7 +12,7 @@ export const login = async (req: Request, res: Response) => {
   try {
     const { name, email, password, role } = req.body as LoginRequest;
 
-    console.log('🔐 Login attempt:', { name, email, role });
+    console.log('Login attempt:', { name, email, password, role });
 
     // Validasi input
     if (!name || !email || !password || !role) {
@@ -63,6 +63,7 @@ export const login = async (req: Request, res: Response) => {
     const userData = {
       name: user.name,
       email: user.email,
+      password: user.password,
       role: user.role
     };
 

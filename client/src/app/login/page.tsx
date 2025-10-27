@@ -28,32 +28,26 @@ export default function Login() {
     });
 
     try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-      const response = await fetch(`${API_URL}/api/login`, {
+      const response = await fetch('http://localhost:5000/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        credentials: 'include', // Important: Include cookies in cross-origin requests
-        body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          password: formData.password,
-          role: formData.role,
-        }),
-      });
+        credentials: 'include',
+      body: JSON.stringify(formData),
+    });
 
       console.log('Response status:', response.status);
-      const data = await response.json();
-      console.log('Response data:', data);
+      const responseData = await response.json();
+      console.log('Response data:', responseData);
 
-      if (data.success) {
+      if (responseData.success) {
         // Login berhasil, redirect ke beranda
         console.log('Login successful, redirecting to /beranda');
         window.location.href = '/beranda'; // Using window.location for reliable redirect
       } else {
         // Login gagal, tampilkan error
-        setError(data.message || 'Login gagal! Periksa kembali data Anda.');
+        setError(responseData.message || 'Login gagal! Periksa kembali data Anda.');
       }
     } catch (error) {
       console.error('Login failed:', error);
