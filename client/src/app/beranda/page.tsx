@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import "leaflet/dist/leaflet.css";
+import dynamic from 'next/dynamic';
 
 interface UserData {
   name: string;
@@ -9,10 +11,13 @@ interface UserData {
   role: string;
 }
 
+const Map = dynamic(() => import("@/components/MapComponent"), { ssr: false });
+
 export default function Beranda() {
   const router = useRouter();
   const [userData, setUserData] = useState<UserData | null>(null);
   const [mounted, setMounted] = useState(false);
+
 
   useEffect(() => {
     setMounted(true);
@@ -60,33 +65,14 @@ export default function Beranda() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           {/* Lokasi Tongkat Section */}
           <div className="bg-[#F5F5F5] rounded-3xl p-8 shadow-md">
-            <h2 className="text-2xl font-bold text-[#2F4156] text-center mb-6" style={{ fontFamily: 'Nunito, sans-serif' }}>
-              Lokasi Tongkat
+            <h2 className="text-2xl font-bold text-[#2F4156] text-center mb-6"
+                style={{ fontFamily: 'Nunito, sans-serif' }}
+              >
+                Lokasi Tongkat
             </h2>
 
-            {/* Map Placeholder */}
-            <div className="bg-white rounded-2xl p-8 mb-6 flex items-center justify-center min-h-[300px] shadow-sm">
-              <div className="text-center">
-                {/* Map Pin Icon */}
-                <div className="mb-4 flex justify-center">
-                  <div className="relative">
-                    <svg width="60" height="80" viewBox="0 0 60 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M30 0C13.4315 0 0 13.4315 0 30C0 46.5685 30 80 30 80C30 80 60 46.5685 60 30C60 13.4315 46.5685 0 30 0Z" fill="#D91656"/>
-                      <circle cx="30" cy="30" r="12" fill="white"/>
-                    </svg>
-                  </div>
-                </div>
-                <p className="text-[#2F4156] text-lg font-semibold mb-1" style={{ fontFamily: 'Nunito, sans-serif' }}>
-                  Tongkat RelaWand 1
-                </p>
-                <p className="text-gray-600 text-sm" style={{ fontFamily: 'Nunito, sans-serif' }}>
-                  Internasional map yang
-                </p>
-                <p className="text-gray-600 text-sm" style={{ fontFamily: 'Nunito, sans-serif' }}>
-                  dimuat dari API Maps
-                </p>
-              </div>
-            </div>
+            <Map />
+
 
             {/* Info Text */}
             <p className="text-center text-gray-600 text-sm italic" style={{ fontFamily: 'Nunito, sans-serif' }}>
