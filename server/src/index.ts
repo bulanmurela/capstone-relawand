@@ -12,7 +12,7 @@ import { setRealtimeService } from './controllers/realtimeController';
 import { setRealtimeService as setHardwareRealtimeService } from './controllers/hardwareController';
 import sensorRoutes from './routes/sensor';
 import userRoutes from './routes/user';
-import deviceRoutes from './routes/device';
+import deviceRoutes from './routes/deviceRoute';
 import imageCaptureRoutes from './routes/imageCapture';
 import alertLogRoutes from './routes/alertLog';
 import hardwareRoutes from './routes/hardware';
@@ -20,6 +20,8 @@ import weatherRoutes from './routes/weather';
 import mapsRoutes from './routes/maps';
 import realtimeRoutes from './routes/realtime';
 import loginRoute from './routes/loginRoute';
+import deviceRoute from './routes/deviceRoute';
+import mongoose from 'mongoose';
 
 dotenv.config();
 
@@ -40,17 +42,26 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+// mongoose
+//   .connect('mongodb://localhost:27017/relawand')
+//   .then(() => {
+//     console.log('Connected to MongoDB');
+//   })
+//   .catch((error) => {
+//     console.error('MongoDB connection error:', error);
+//   });
+
 // Routes
-app.use('/api/sensors', sensorRoutes);
-app.use('/api/users', userRoutes);
-app.use('/api/devices', deviceRoutes);
-app.use('/api/image-captures', imageCaptureRoutes);
-app.use('/api/alerts', alertLogRoutes);
-app.use('/api/hardware', hardwareRoutes);
-app.use('/api/weather', weatherRoutes);
-app.use('/api/maps', mapsRoutes);
-app.use('/api/realtime', realtimeRoutes);
+// app.use('/api/sensors', sensorRoutes);
+// app.use('/api/users', userRoutes);
+// app.use('/api/image-captures', imageCaptureRoutes);
+// app.use('/api/alerts', alertLogRoutes);
+// app.use('/api/hardware', hardwareRoutes);
+// app.use('/api/weather', weatherRoutes);
+// app.use('/api/maps', mapsRoutes);
+// app.use('/api/realtime', realtimeRoutes);
 app.use('/login', loginRoute);
+app.use('/devices', deviceRoute);
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'RelaWand API is running' });
