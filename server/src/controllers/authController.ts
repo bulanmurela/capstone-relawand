@@ -12,7 +12,7 @@ export const login = async (req: Request, res: Response) => {
   try {
     const { name, email, password, role } = req.body as LoginRequest;
 
-    console.log('Login attempt:', { name, email, password, role });
+    console.log('🔐 Login attempt:', { name, email, role });
 
     // Validasi input
     if (!name || !email || !password || !role) {
@@ -77,14 +77,15 @@ export const login = async (req: Request, res: Response) => {
     });
 
     res.cookie('user-data', JSON.stringify(userData), {
-      httpOnly: false,
+      httpOnly: false, // Accessible from frontend
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       maxAge: 24 * 60 * 60 * 1000,
       path: '/',
     });
 
-    console.log('✅ Login successful');
+    console.log('✅ Login successful - Cookies set');
+    console.log('🍪 auth-token:', token.substring(0, 20) + '...');
 
     return res.status(200).json({
       success: true,
@@ -109,7 +110,7 @@ export const logout = async (req: Request, res: Response) => {
     res.clearCookie('auth-token', { path: '/' });
     res.clearCookie('user-data', { path: '/' });
 
-    console.log('✅ Logout successful');
+    console.log('✅ Logout successful - Cookies cleared');
 
     return res.status(200).json({
       success: true,
@@ -127,18 +128,34 @@ export const logout = async (req: Request, res: Response) => {
 
 export const checkAuth = async (req: Request, res: Response) => {
   try {
+    console.log('🔍 Auth check request');
+    console.log('🍪 Cookies received:', req.cookies);
+    
     const token = req.cookies['auth-token'];
-    const userData = req.cookies['user-data'];
+    const userDataStr = req.cookies['user-data'];
 
     if (!token) {
-      return res.status(401).json({
+      console.log('❌ No auth token found');
+      return res.status(200).json({
         authenticated: false
       });
     }
 
+    console.log('✅ Auth token found:', token.substring(0, 20) + '...');
+
+    let userData = null;
+    if (userDataStr) {
+      try {
+        userData = JSON.parse(userDataStr);
+        console.log('✅ User data parsed:', userData.email);
+      } catch (e) {
+        console.error('❌ Failed to parse user-data cookie');
+      }
+    }
+
     return res.status(200).json({
       authenticated: true,
-      user: userData ? JSON.parse(userData) : null
+      user: userData
     });
 
   } catch (error) {
