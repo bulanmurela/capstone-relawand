@@ -5,6 +5,7 @@ import L, { Icon } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useRouter } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
+import React from "react";
 
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -29,7 +30,7 @@ function MapResizer() {
   return null;
 }
 
-const MAPTILER_KEY = "If1HmUQzgCdeAByEleKC";
+const MAPTILER_KEY = process.env.NEXT_PUBLIC_MAPTILER_KEY || "";
 
 interface Device {
     _id: string;
@@ -39,10 +40,17 @@ interface Device {
     status: string;
 }
 
+export type MapProps = {
+    locationId: number;
+};
+
 export default function MapComponent() {
+    const [mounted, setMounted] = useState(false);
+    const mapRef = useRef<L.Map | null>(null);
     const router = useRouter();
     const [deviceList, setDeviceList] =  useState<Device[]>([]);
     const [name, setName] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
     const [latitude, setLatitude] = useState('');
     const [longitude, setLongitude] = useState('');
     const [status, setStatus] = useState('');
@@ -53,12 +61,31 @@ export default function MapComponent() {
         iconAnchor: [15, 30],
     });
 
-    useEffect(() => {
-    fetch("http://localhost:5000/device")
-      .then((res) => res.json())
-      .then((data: Device[]) => setDeviceList(data))
-      .catch((err) => console.error("Error fetching device:", err));
+     useEffect(() => {
+        setMounted(true);
+        fetchDevices();
     }, []);
+
+    const fetchDevices = async () => {
+        setIsLoading(true);
+        try {
+        const response = await fetch("http://localhost:5000/devices", {
+            method: 'GET',
+            credentials: 'include' // Tambahkan untuk auth
+        });
+        
+        if (!response.ok) {
+            throw new Error('Failed to fetch devices');
+        }
+        
+        const data: Device[] = await response.json();
+        setDeviceList(data);
+        } catch (err) {
+        console.error("Error fetching devices:", err);
+        } finally {
+        setIsLoading(false);
+        }
+    };
 
     const handleAddDevice = async (e: React.FormEvent) => {
         e.preventDefault();
