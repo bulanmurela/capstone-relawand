@@ -41,14 +41,14 @@ export default function ForestCamera({ locationId }: Props) {
     <div className="bg-[#567C8D]/15 rounded-[25px] p-8">
       {/* Title */}
       <h2 
-        className="text-3xl font-bold text-black text-center mb-6"
+        className="text-2xl font-bold text-black text-center mb-6"
         style={{ fontFamily: 'Nunito, sans-serif' }}
       >
         Gambar Lingkungan Hutan
       </h2>
 
       {/* Image Container */}
-      <div className="bg-[#D9D9D9] rounded-[20px] w-full h-[380px] flex items-center justify-center relative overflow-hidden">
+      <div className="bg-[#D9D9D9] rounded-[20px] w-full h-auto flex items-center justify-center relative overflow-hidden">
         {imageUrl && isActive ? (
           <img 
             src={imageUrl} 
@@ -98,7 +98,7 @@ export default function ForestCamera({ locationId }: Props) {
         <button
           onClick={handleActivateCamera}
           disabled={isLoading}
-          className="bg-[#567C8D] hover:bg-[#476b7a] disabled:bg-gray-400 text-white px-12 py-4 rounded-[30px] text-2xl font-semibold transition-colors flex items-center gap-3"
+          className="bg-[#567C8D] hover:bg-[#476b7a] disabled:bg-gray-400 text-white px-8 py-4 rounded-[30px] text-xl font-semibold transition-colors flex items-center gap-3"
           style={{ fontFamily: 'Nunito, sans-serif' }}
         >
           {isLoading ? (
