@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import AlertLog, { IAlertLog } from '../models/AlertLog';
+import AlertLog, { IAlertLog } from '../models/Alert';
 
 export const createAlertLog = async (req: Request, res: Response) => {
   try {

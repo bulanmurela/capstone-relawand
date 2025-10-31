@@ -12,17 +12,16 @@ import { WeatherService } from './services/weatherService';
 import { RealtimeService } from './services/realtimeService';
 import { setRealtimeService } from './controllers/realtimeController';
 import { setRealtimeService as setHardwareRealtimeService } from './controllers/hardwareController';
-import sensorRoutes from './routes/sensorRoute';
+import sensorRoute from './routes/sensorRoute';
 import userRoutes from './routes/user';
 import imageCaptureRoutes from './routes/imageCapture';
-import alertLogRoutes from './routes/alertLog';
+import alertLogRoutes from './routes/alertRoute';
 import hardwareRoutes from './routes/hardware';
 import weatherRoutes from './routes/weather';
 import mapsRoutes from './routes/maps';
 import realtimeRoutes from './routes/realtime';
 import loginRoute from './routes/loginRoute';
 import deviceRoute from './routes/deviceRoute';
-import mongoose from 'mongoose';
 
 dotenv.config();
 
@@ -82,7 +81,7 @@ app.post('/api/auth/logout', (req, res, next) => {
 app.use('/devices', deviceRoute); // Changed to plural for consistency
 
 // FIXED: Register all other routes
-app.use('/api/sensors', sensorRoutes);
+app.use('/api/sensors', sensorRoute);
 app.use('/api/users', userRoutes);
 app.use('/api/images', imageCaptureRoutes);
 app.use('/api/alerts', alertLogRoutes);

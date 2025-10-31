@@ -4,6 +4,7 @@ import { Inter, Nunito } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { AlertProvider } from "@/contexts/AlertContexts";
 import "leaflet/dist/leaflet.css";
 
 const inter = Inter({
@@ -31,9 +32,11 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${inter.variable} ${nunito.variable} antialiased`}>
         <main>
-          <Navbar />
-          {children}
-          <Footer />
+          <AlertProvider>
+            <Navbar />
+            {children}
+            <Footer />
+          </AlertProvider>
         </main>
       </body>
     </html>

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAlert } from '@/contexts/AlertContexts';
 import "leaflet/dist/leaflet.css";
 import dynamic from 'next/dynamic';
 
@@ -18,7 +19,17 @@ export default function Beranda() {
   const router = useRouter();
   const [userData, setUserData] = useState<UserData | null>(null);
   const [mounted, setMounted] = useState(false);
+  const { showAlert } = useAlert();
 
+  const testAlert = () => {
+    showAlert({
+      level: 'DARURAT',
+      deviceName: 'RelaWand 1',
+      temperature: 42,
+      humidity: 45,
+      gasConcentration: 700,
+    });
+  }
 
   useEffect(() => {
     setMounted(true);
@@ -93,6 +104,12 @@ export default function Beranda() {
             <p className="text-center text-gray-600 text-base italic mt-4" style={{ fontFamily: 'Nunito, sans-serif' }}>
               Data prakiraan diperbarui setiap jam
             </p>
+          </div>
+          <div>
+            <button onClick={testAlert}>
+              Test Alert SIAGA
+            </button>
+            {/* Rest of page content */}
           </div>
         </div>
       </div>
