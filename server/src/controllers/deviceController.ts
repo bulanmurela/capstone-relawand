@@ -3,7 +3,7 @@ import Device, { IDevice } from '../models/Device';
 
 export const createDevice = async (req: Request, res: Response) => {
   try {
-    const deviceData: IDevice = new Device(req.body);
+    const deviceData = new Device(req.body);
     const savedDevice = await deviceData.save();
 
     res.status(201).json({
@@ -12,6 +12,7 @@ export const createDevice = async (req: Request, res: Response) => {
       message: 'Device created successfully'
     });
   } catch (error: any) {
+    console.error('Error creating device:', error);
     if (error.code === 11000) {
       res.status(400).json({
         success: false,

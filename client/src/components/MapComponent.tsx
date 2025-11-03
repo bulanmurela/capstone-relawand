@@ -34,10 +34,17 @@ const MAPTILER_KEY = process.env.NEXT_PUBLIC_MAPTILER_KEY || "";
 
 interface Device {
     _id: string;
-    name: string;
-    latitude: number;
-    longitude: number;
-    status: string;
+    deviceId: string;
+    deviceName: string;
+    deviceType: string;
+    location: {
+        latitude?: number;
+        longitude?: number;
+        address?: string;
+    };
+    statusDevice: string;
+    userId?: string;
+    isActive: boolean;
 }
 
 export type MapProps = {
@@ -49,11 +56,11 @@ export default function MapComponent() {
     const mapRef = useRef<L.Map | null>(null);
     const router = useRouter();
     const [deviceList, setDeviceList] =  useState<Device[]>([]);
-    const [name, setName] = useState('');
+    const [deviceName, setDeviceName] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [latitude, setLatitude] = useState('');
     const [longitude, setLongitude] = useState('');
-    const [status, setStatus] = useState('');
+    const [statusDevice, setStatusDevice] = useState('offline');
 
     const customIcon: Icon = L.icon({
         iconUrl: "https://cdn-icons-png.flaticon.com/512/684/684908.png",
@@ -71,15 +78,17 @@ export default function MapComponent() {
         try {
         const response = await fetch("http://localhost:5000/devices", {
             method: 'GET',
-            credentials: 'include' // Tambahkan untuk auth
+            credentials: 'include'
         });
-        
+
         if (!response.ok) {
             throw new Error('Failed to fetch devices');
         }
-        
-        const data: Device[] = await response.json();
-        setDeviceList(data);
+
+        const result = await response.json();
+        // Handle the new API response format {success: true, data: devices, pagination: {...}}
+        const devices = result.data || result;
+        setDeviceList(devices);
         } catch (err) {
         console.error("Error fetching devices:", err);
         } finally {
@@ -90,33 +99,42 @@ export default function MapComponent() {
     const handleAddDevice = async (e: React.FormEvent) => {
         e.preventDefault();
         const newDevice = {
-            name,
-            latitude: parseFloat(latitude),
-            longitude: parseFloat(longitude),
-            status
+            deviceId: `DEVICE-${Date.now()}`,
+            deviceName: deviceName,
+            deviceType: 'STM32',
+            location: {
+                latitude: parseFloat(latitude),
+                longitude: parseFloat(longitude),
+            },
+            statusDevice: statusDevice,
         };
 
         try {
-            const response = await fetch("http://localhost:5000/device", {
+            const response = await fetch("http://localhost:5000/devices", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
+                credentials: 'include',
                 body: JSON.stringify(newDevice)
             });
 
             if (response.ok) {
-                const addedDevice = await response.json();
-                setDeviceList((prev) => [...prev, addedDevice]);
-                setName('');
+                const result = await response.json();
+                const addedDevice = result.data || result;
+                await fetchDevices(); // Refresh device list
+                setDeviceName('');
                 setLatitude('');
                 setLongitude('');
-                setStatus('');
+                setStatusDevice('offline');
             } else {
-                console.error("Error adding device:", response.statusText);
+                const errorData = await response.json();
+                console.error("Error adding device:", errorData);
+                alert(`Error: ${errorData.message || 'Failed to add device'}`);
             }
         } catch (error) {
             console.error("Error adding device:", error);
+            alert('Failed to add device. Please try again.');
         }
     };
 
@@ -124,7 +142,9 @@ export default function MapComponent() {
         router.push(`/grafik-pemantauan/${deviceId}`);
     }
 
-    const initialPosition: [number, number] = deviceList.length > 0 ? [deviceList[0].latitude, deviceList[0].longitude] : [-7.8257448, 110.6734842];
+    const initialPosition: [number, number] = deviceList.length > 0 && deviceList[0].location?.latitude && deviceList[0].location?.longitude
+        ? [deviceList[0].location.latitude, deviceList[0].location.longitude]
+        : [-7.8257448, 110.6734842];
 
 	return (
         <div className="bg-[#F5F5F5] rounded-2xl overflow-hidden mb-6">
@@ -139,20 +159,23 @@ export default function MapComponent() {
                 attribution='&copy; <a href="https://www.maptiler.com/copyright/">MapTiler</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>'
             />
 
-            {deviceList.map((device) => (
-                <Marker
-                  key={device._id}
-                  position={[device.latitude, device.longitude]}
-                  icon={customIcon}
-                  eventHandlers={{
-                      click: () => handleMarkerClick(device._id)
-                  }}
-                >
-                  <Popup>
-                    <strong>{device.name}</strong>
-                  </Popup>
-                </Marker>
-            ))}
+            {deviceList.map((device) => {
+                if (!device.location?.latitude || !device.location?.longitude) return null;
+                return (
+                    <Marker
+                      key={device._id}
+                      position={[device.location.latitude, device.location.longitude]}
+                      icon={customIcon}
+                      eventHandlers={{
+                          click: () => handleMarkerClick(device._id)
+                      }}
+                    >
+                      <Popup>
+                        <strong>{device.deviceName}</strong>
+                      </Popup>
+                    </Marker>
+                );
+            })}
         </MapContainer>
 
         {/* Form Tambah Titik */}
@@ -166,8 +189,8 @@ export default function MapComponent() {
             <input
                 type="text"
                 placeholder="Nama Tongkat"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                value={deviceName}
+                onChange={(e) => setDeviceName(e.target.value)}
                 className="p-2 rounded h-1/3 w-1/4 text-sm"
                 required
             />
@@ -189,14 +212,16 @@ export default function MapComponent() {
                 className="p-2 rounded h-1/3 w-1/4 text-sm"
                 required
             />
-            <input
-                type="text"
-                placeholder="Status"
-                value={status}
-                onChange={(e) => setStatus(e.target.value)}
+            <select
+                value={statusDevice}
+                onChange={(e) => setStatusDevice(e.target.value)}
                 className="p-2 rounded h-1/3 w-1/5 text-sm"
                 required
-            />
+            >
+                <option value="offline">Offline</option>
+                <option value="online">Online</option>
+                <option value="error">Error</option>
+            </select>
             <button
                 type="submit"
                 className="bg-green-600 text-white px-4 rounded"

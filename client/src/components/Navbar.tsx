@@ -11,6 +11,7 @@ export default function Navbar() {
     { name: 'Beranda', path: '/beranda' },
     { name: 'Grafik Pemantauan', path: '/grafik-pemantauan' },
     { name: 'Histori Peringatan', path: '/histori-alert' },
+    { name: 'Log', path: '/log' },
     { name: 'Profil', path: '/profil' },
   ];
 
