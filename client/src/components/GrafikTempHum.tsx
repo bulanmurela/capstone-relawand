@@ -19,60 +19,47 @@ export default function TemperatureHumidityChart({ locationId }: Props) {
   const [currentHumidity, setCurrentHumidity] = useState(0);
 
   useEffect(() => {
-    // Generate data untuk 24 jam terakhir (per 30 menit = 48 data points)
-    const generateHourlyData = () => {
-      const dummyData: ChartData[] = [];
-      const now = new Date();
+  const fetchData = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/sensor-data/${locationId}?hours=24`,
+        { credentials: 'include' }
+      );
       
-      // Generate 48 data points (24 jam × 2 = setiap 30 menit)
-      for (let i = 47; i >= 0; i--) {
-        const time = new Date(now.getTime() - (i * 30 * 60 * 1000)); // 30 menit dalam ms
+      if (response.ok) {
+        const apiData = await response.json();
         
-        dummyData.push({
-          time: time.toLocaleTimeString('id-ID', { 
-            hour: '2-digit', 
+        // Transform to chart format
+        const chartData = apiData.map((item: any) => ({
+          time: new Date(item.timestamp).toLocaleTimeString('id-ID', {
+            hour: '2-digit',
             minute: '2-digit',
-            hour12: false 
+            hour12: false
           }),
-          temperature: Math.floor(Math.random() * (35 - 25) + 25), // 25-35°C
-          humidity: Math.floor(Math.random() * (90 - 60) + 60), // 60-90%
-        });
-      }
-
-      return dummyData;
-    };
-
-    const initialData = generateHourlyData();
-    setData(initialData);
-    
-    // Set current values
-    const latest = initialData[initialData.length - 1];
-    setCurrentTemp(latest.temperature);
-    setCurrentHumidity(latest.humidity);
-
-    // Simulate real-time updates every 5 seconds
-    const interval = setInterval(() => {
-      setData(prevData => {
-        const newData = [...prevData];
-        newData.shift(); // Remove oldest
+          temperature: item.temperature,
+          humidity: item.humidity
+        }));
         
-        const now = new Date();
-        const newEntry = ({
-          time: now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', hour12: false }),
-          temperature: Math.floor(Math.random() * (35 - 25) + 25),
-          humidity: Math.floor(Math.random() * (90 - 60) + 60),
-        });
+        setData(chartData);
+        
+        // Set current values
+        if (chartData.length > 0) {
+          const latest = chartData[chartData.length - 1];
+          setCurrentTemp(latest.temperature);
+          setCurrentHumidity(latest.humidity);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching sensor data:', error);
+    }
+  };
 
-        newData.push(newEntry);
-        setCurrentTemp(newEntry.temperature);
-        setCurrentHumidity(newEntry.humidity);
-
-        return newData;
-      });
-    }, 30000); // Update every 30 seconds
-
-    return () => clearInterval(interval);
-  }, [locationId]);
+  fetchData();
+  
+  // Refresh every 5 minutes
+  const interval = setInterval(fetchData, 5 * 60 * 1000);
+  return () => clearInterval(interval);
+}, [locationId]);
 
   return (
     <div className="bg-[#567C8D]/15 rounded-[25px] p-6">

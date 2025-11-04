@@ -1,7 +1,7 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
 export interface IDevice extends Document {
-  deviceId: string;
+  _id: mongoose.Types.ObjectId;
   deviceName: string;
   deviceType: string;
   location?: {

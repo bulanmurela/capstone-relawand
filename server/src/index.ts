@@ -9,17 +9,12 @@ import session from 'express-session';
 import MongoStore from 'connect-mongo';
 import { connectDB } from './config/database';
 import { WeatherService } from './services/weatherService';
-import { RealtimeService } from './services/realtimeService';
+// import { RealtimeService } from './services/realtimeService';
 import { setRealtimeService } from './controllers/realtimeController';
-import { setRealtimeService as setHardwareRealtimeService } from './controllers/hardwareController';
-import sensorRoute from './routes/sensorRoute';
+import { DummyDataGenerator } from './services/dummyDataGenerator';
+import sensorDataRoute from './routes/sensorDataRoute';
 import userRoutes from './routes/user';
-import imageCaptureRoutes from './routes/imageCapture';
 import alertLogRoutes from './routes/alertRoute';
-import hardwareRoutes from './routes/hardware';
-import weatherRoutes from './routes/weather';
-import mapsRoutes from './routes/maps';
-import realtimeRoutes from './routes/realtime';
 import loginRoute from './routes/loginRoute';
 import deviceRoute from './routes/deviceRoute';
 
@@ -28,6 +23,14 @@ dotenv.config();
 const app = express();
 const httpServer = createServer(app);
 const PORT = process.env.PORT || 5000;
+
+// Disable caching globally for API responses
+app.use((req, res, next) => {
+  res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+  res.set('Pragma', 'no-cache');
+  res.set('Expires', '0');
+  next();
+});
 
 // CORS - MUST be before other middleware
 app.use(cors({
@@ -81,14 +84,9 @@ app.post('/api/auth/logout', (req, res, next) => {
 app.use('/devices', deviceRoute); // Changed to plural for consistency
 
 // FIXED: Register all other routes
-app.use('/api/sensors', sensorRoute);
 app.use('/api/users', userRoutes);
-app.use('/api/images', imageCaptureRoutes);
 app.use('/api/alerts', alertLogRoutes);
-app.use('/api/hardware', hardwareRoutes);
-app.use('/api/weather', weatherRoutes);
-app.use('/api/maps', mapsRoutes);
-app.use('/api/realtime', realtimeRoutes);
+app.use('/api/sensor-data', sensorDataRoute);
 
 // Health check
 app.get('/api/health', (req, res) => {
@@ -126,9 +124,11 @@ const startServer = async () => {
     weatherService.startHourlyWeatherUpdates();
 
     // Initialize real-time service
-    const realtimeService = new RealtimeService(httpServer);
-    setRealtimeService(realtimeService);
-    setHardwareRealtimeService(realtimeService);
+    // const realtimeService = new RealtimeService(httpServer);
+    // setRealtimeService(realtimeService);
+
+    const dummyDataGenerator = new DummyDataGenerator();
+    dummyDataGenerator.start(5); // start generating data every 5 MINUTES
 
     httpServer.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);

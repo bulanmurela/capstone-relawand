@@ -34,7 +34,7 @@ const MAPTILER_KEY = process.env.NEXT_PUBLIC_MAPTILER_KEY || "";
 
 interface Device {
     _id: string;
-    deviceId: string;
+    // deviceId?: string;
     deviceName: string;
     deviceType: string;
     location: {
@@ -74,27 +74,35 @@ export default function MapComponent() {
     }, []);
 
     const fetchDevices = async () => {
-        setIsLoading(true);
-        try {
+    setIsLoading(true);
+    try {
         const response = await fetch("http://localhost:5000/devices", {
-            method: 'GET',
-            credentials: 'include'
+        method: "GET",
+        credentials: "include"
         });
 
         if (!response.ok) {
-            throw new Error('Failed to fetch devices');
+        throw new Error("Failed to fetch devices");
         }
 
         const result = await response.json();
-        // Handle the new API response format {success: true, data: devices, pagination: {...}}
-        const devices = result.data || result;
+        console.log("Fetched devices result:", result);
+
+        // handle semua kemungkinan format
+        const devices = Array.isArray(result)
+        ? result
+        : Array.isArray(result.data)
+        ? result.data
+        : [];
+
         setDeviceList(devices);
-        } catch (err) {
+    } catch (err) {
         console.error("Error fetching devices:", err);
-        } finally {
+    } finally {
         setIsLoading(false);
-        }
+    }
     };
+
 
     const handleAddDevice = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -138,8 +146,8 @@ export default function MapComponent() {
         }
     };
 
-    const handleMarkerClick = (deviceId: string) => {
-        router.push(`/grafik-pemantauan/${deviceId}`);
+    const handleMarkerClick = (_id: string) => {
+        router.push(`/grafik-pemantauan?deviceId=${encodeURIComponent(_id)}`);
     }
 
     const initialPosition: [number, number] = deviceList.length > 0 && deviceList[0].location?.latitude && deviceList[0].location?.longitude
@@ -160,18 +168,32 @@ export default function MapComponent() {
             />
 
             {deviceList.map((device) => {
-                if (!device.location?.latitude || !device.location?.longitude) return null;
+                // dukung kedua format data
+                const lat = device.location?.latitude ?? (device as any).latitude;
+                const lon = device.location?.longitude ?? (device as any).longitude;
+                const name = device.deviceName || (device as any).name;
+
+                if (!lat || !lon) return null;
                 return (
                     <Marker
                       key={device._id}
-                      position={[device.location.latitude, device.location.longitude]}
+                      position={[lat, lon]}
                       icon={customIcon}
                       eventHandlers={{
-                          click: () => handleMarkerClick(device._id)
+                          click: () => handleMarkerClick(device._id),
                       }}
                     >
                       <Popup>
-                        <strong>{device.deviceName}</strong>
+                        <div className="flex flex-col items-start gap-2">
+                            <div className="font-semibold">{device.deviceName || (device as any).name}</div>
+                            <button
+                            onClick={() => router.push(`/grafik-pemantauan?deviceId=${encodeURIComponent(device._id)}`)}
+                            className="text-sm text-blue-600 underline"
+                            type="button"
+                            >
+                            Lihat Grafik Pemantauan
+                            </button>
+                        </div>
                       </Popup>
                     </Marker>
                 );

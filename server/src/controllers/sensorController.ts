@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import SensorData, { ISensorData } from '../models/Sensor';
+import SensorData, { ISensorData } from '../models/SensorData';
 
 export const createSensorData = async (req: Request, res: Response) => {
   try {

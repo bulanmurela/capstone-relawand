@@ -121,14 +121,14 @@ export class WeatherService {
           device.location!.latitude!,
           device.location!.longitude!
         );
-        return { deviceId: device.deviceId, weather };
+        return { deviceId: device._id, weather };
       });
 
       const results = await Promise.all(weatherPromises);
 
       const weatherMap: { [deviceId: string]: IWeatherDataDocument | null } = {};
       results.forEach(result => {
-        weatherMap[result.deviceId] = result.weather;
+        weatherMap[result.deviceId.toString()] = result.weather;
       });
 
       return weatherMap;
@@ -186,7 +186,7 @@ export class WeatherService {
             device.location!.longitude!
           );
         } catch (error) {
-          console.error(`Failed to update weather for device ${device.deviceId}:`, error);
+          console.error(`Failed to update weather for device ${device._id}:`, error);
         }
       }
 
@@ -217,7 +217,7 @@ export class WeatherService {
             device.location!.longitude!
           );
         } catch (error) {
-          console.error(`Failed to update weather for active device ${device.deviceId}:`, error);
+          console.error(`Failed to update weather for active device ${device._id}:`, error);
         }
       }
     } catch (error) {
