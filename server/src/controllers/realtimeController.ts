@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { RealtimeService } from '../services/realtimeService';
-import SensorData from '../models/Sensor';
+import SensorData from '../models/SensorData';
 
 let realtimeService: RealtimeService;
 
