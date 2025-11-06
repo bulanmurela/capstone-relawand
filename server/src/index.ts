@@ -9,14 +9,16 @@ import session from 'express-session';
 import MongoStore from 'connect-mongo';
 import { connectDB } from './config/database';
 import { WeatherService } from './services/weatherService';
-// import { RealtimeService } from './services/realtimeService';
+import { RealtimeService } from './services/realtimeService';
 import { setRealtimeService } from './controllers/realtimeController';
 import { DummyDataGenerator } from './services/dummyDataGenerator';
+import MqttService from './services/mqttService';
 import sensorDataRoute from './routes/sensorDataRoute';
 import userRoutes from './routes/user';
 import alertLogRoutes from './routes/alertRoute';
 import loginRoute from './routes/loginRoute';
 import deviceRoute from './routes/deviceRoute';
+import mqttLogRoute from './routes/mqttLogRoute';
 
 dotenv.config();
 
@@ -87,6 +89,7 @@ app.use('/devices', deviceRoute); // Changed to plural for consistency
 app.use('/api/users', userRoutes);
 app.use('/api/alerts', alertLogRoutes);
 app.use('/api/sensor-data', sensorDataRoute);
+app.use('/api/mqtt-logs', mqttLogRoute);
 
 // Health check
 app.get('/api/health', (req, res) => {
@@ -124,8 +127,24 @@ const startServer = async () => {
     weatherService.startHourlyWeatherUpdates();
 
     // Initialize real-time service
-    // const realtimeService = new RealtimeService(httpServer);
-    // setRealtimeService(realtimeService);
+    const realtimeService = new RealtimeService(httpServer);
+    setRealtimeService(realtimeService);
+
+    // Initialize MQTT service
+    const mqttBroker = process.env.MQTT_BROKER || 'test.mosquitto.org';
+    const mqttTopic = process.env.MQTT_TOPIC || '/topic';
+    const mqttPort = parseInt(process.env.MQTT_PORT || '1883', 10);
+
+    const mqttService = new MqttService({
+      broker: mqttBroker,
+      topic: mqttTopic,
+      port: mqttPort,
+      defaultDeviceId: process.env.DEFAULT_DEVICE_ID || 'STM32-001'
+    });
+
+    // Connect realtime service to MQTT
+    mqttService.setRealtimeService(realtimeService);
+    await mqttService.connect();
 
     const dummyDataGenerator = new DummyDataGenerator();
     dummyDataGenerator.start(5); // start generating data every 5 MINUTES
@@ -138,6 +157,7 @@ const startServer = async () => {
       console.log(`⏰ Weather scheduler started - updates every hour`);
       console.log(`📡 Real-time WebSocket server ready`);
       console.log(`📊 Graph data streaming enabled`);
+      console.log(`📡 MQTT service connected to ${mqttBroker}:${mqttPort}`);
     });
   } catch (error) {
     console.error('Failed to start server:', error);

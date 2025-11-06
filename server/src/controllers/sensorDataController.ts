@@ -1,27 +1,44 @@
 import { Request, Response } from 'express';
 import SensorData from '../models/SensorData';
 
-// Get sensor data for specific device (24 hours, 30-minute intervals)
+// Get sensor data for specific device
 export const getSensorData = async (req: Request, res: Response) => {
   try {
     const { deviceId } = req.params;
-    const { hours = 24 } = req.query;
+    const { hours, limit, interval } = req.query;
 
-    // Get data from last X hours
-    const startTime = new Date();
-    startTime.setHours(startTime.getHours() - Number(hours));
+    let data;
 
-    const data = await SensorData.find({
-      deviceId,
-      timestamp: { $gte: startTime }
-    })
-    .sort({ timestamp: 1 }) // Oldest first
-    .lean();
+    if (limit) {
+      // Return the last N records (most recent data points)
+      const limitNum = Number(limit);
+      data = await SensorData.find({ deviceId })
+        .sort({ timestamp: -1 }) // Newest first
+        .limit(limitNum)
+        .lean();
 
-    // Aggregate to 30-minute intervals to reduce data points
-    const aggregated = aggregateData(data, 30);
+      // Reverse to show oldest to newest for chart display
+      data.reverse();
+    } else {
+      // Return data from last X hours (default 24)
+      const hoursNum = hours ? Number(hours) : 24;
+      const startTime = new Date();
+      startTime.setHours(startTime.getHours() - hoursNum);
 
-    res.json(aggregated);
+      data = await SensorData.find({
+        deviceId,
+        timestamp: { $gte: startTime }
+      })
+      .sort({ timestamp: 1 }) // Oldest first
+      .lean();
+
+      // Apply aggregation if interval is specified
+      if (interval) {
+        data = aggregateData(data, Number(interval));
+      }
+    }
+
+    res.json(data);
   } catch (error) {
     console.error('Error fetching sensor data:', error);
     res.status(500).json({ message: 'Error fetching sensor data', error });
@@ -51,16 +68,17 @@ export const getLatestSensorData = async (req: Request, res: Response) => {
 // Create sensor data (dari hardware atau dummy generator)
 export const createSensorData = async (req: Request, res: Response) => {
   try {
-    const { deviceId, temperature, humidity, co, co2, lpg } = req.body;
+    const { deviceId, temperature, humidity, gas_adc, gas_ppm, voltage, alarm } = req.body;
 
     const sensorData = new SensorData({
       deviceId,
       timestamp: new Date(),
       temperature,
       humidity,
-      co,
-      co2,
-      lpg
+      gas_adc,
+      gas_ppm,
+      voltage,
+      alarm: alarm || false
     });
 
     await sensorData.save();
@@ -111,25 +129,29 @@ function averageBucket(bucket: any[]) {
     timestamp: bucket[Math.floor(bucket.length / 2)].timestamp,
     temperature: 0,
     humidity: 0,
-    co: 0,
-    co2: 0,
-    lpg: 0
+    gas_adc: 0,
+    gas_ppm: 0,
+    voltage: 0,
+    alarm: false
   };
 
+  let alarmCount = 0;
   bucket.forEach(point => {
-    avg.temperature += point.temperature;
-    avg.humidity += point.humidity;
-    avg.co += point.co;
-    avg.co2 += point.co2;
-    avg.lpg += point.lpg;
+    avg.temperature += point.temperature || 0;
+    avg.humidity += point.humidity || 0;
+    avg.gas_adc += point.gas_adc || 0;
+    avg.gas_ppm += point.gas_ppm || 0;
+    avg.voltage += point.voltage || 0;
+    if (point.alarm) alarmCount++;
   });
 
   const count = bucket.length;
-  avg.temperature = Math.round(avg.temperature / count * 10) / 10;
-  avg.humidity = Math.round(avg.humidity / count * 10) / 10;
-  avg.co = Math.round(avg.co / count);
-  avg.co2 = Math.round(avg.co2 / count);
-  avg.lpg = Math.round(avg.lpg / count);
+  avg.temperature = Math.round((avg.temperature / count) * 10) / 10;
+  avg.humidity = Math.round((avg.humidity / count) * 10) / 10;
+  avg.gas_adc = Math.round(avg.gas_adc / count);
+  avg.gas_ppm = Math.round(avg.gas_ppm / count);
+  avg.voltage = Math.round((avg.voltage / count) * 1000) / 1000;
+  avg.alarm = alarmCount > count / 2; // Alarm if more than half of readings had alarm
 
   return avg;
 }

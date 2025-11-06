@@ -17,7 +17,6 @@ const UserSchema: Schema = new Schema({
   username: {
     type: String,
     required: true,
-    unique: true,
     trim: true,
     minlength: 3,
     maxlength: 50
@@ -25,7 +24,6 @@ const UserSchema: Schema = new Schema({
   email: {
     type: String,
     required: true,
-    unique: true,
     trim: true,
     lowercase: true
   },
@@ -60,7 +58,7 @@ const UserSchema: Schema = new Schema({
   timestamps: true
 });
 
-UserSchema.index({ email: 1 });
-UserSchema.index({ username: 1 });
+UserSchema.index({ email: 1 }, { unique: true });
+UserSchema.index({ username: 1 }, { unique: true });
 
 export default mongoose.model<IUser>('User', UserSchema);

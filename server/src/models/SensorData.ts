@@ -3,11 +3,12 @@ import mongoose, { Schema, Document } from 'mongoose';
 export interface ISensorData extends Document {
   deviceId: string;
   timestamp: Date;
-  temperature: number;
-  humidity: number;
-  co: number;
-  co2: number;
-  lpg: number;
+  temperature: number | null;
+  humidity: number | null;
+  gas_adc: number;
+  gas_ppm: number;
+  voltage: number;
+  alarm: boolean;
   createdAt: Date;
 }
 
@@ -24,23 +25,30 @@ const SensorDataSchema = new Schema({
   },
   temperature: {
     type: Number,
-    required: true
+    required: false,
+    default: null
   },
   humidity: {
     type: Number,
-    required: true
+    required: false,
+    default: null
   },
-  co: {
+  gas_adc: {
     type: Number,
     required: true
   },
-  co2: {
+  gas_ppm: {
     type: Number,
     required: true
   },
-  lpg: {
+  voltage: {
     type: Number,
     required: true
+  },
+  alarm: {
+    type: Boolean,
+    required: true,
+    default: false
   }
 }, {
   timestamps: true,

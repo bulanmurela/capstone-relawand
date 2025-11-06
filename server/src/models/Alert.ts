@@ -9,6 +9,8 @@ export interface IAlertLog {
   humidity: number;
   gasConcentration: number;
   timestamp?: Date;
+  isViewed?: boolean;
+  viewedAt?: Date;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -43,6 +45,14 @@ const alertSchema = new mongoose.Schema({
   timestamp: {
     type: Date,
     default: Date.now
+  },
+  isViewed: {
+    type: Boolean,
+    default: false
+  },
+  viewedAt: {
+    type: Date,
+    required: false
   }
 }, {
   timestamps: true

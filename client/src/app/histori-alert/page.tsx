@@ -25,67 +25,20 @@ export default function HistoriPeringatanPage() {
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Fungsi untuk menentukan level alert
-  const determineAlertLevel = (temp: number, gas: number): AlertLevel => {
-    if (temp > 40 || gas > 600) return 'DARURAT';
-    if ((temp >= 36 && temp <= 40) || (gas >= 300 && gas <= 600)) return 'SIAGA';
-    return 'NORMAL';
-  };
-
-  // Generate dummy alerts
-  const generateDummyAlerts = (): Alert[] => {
-    const dummyAlerts: Alert[] = [];
-    const now = new Date();
-
-    for (let i = 0; i < 20; i++) {
-      const date = new Date(now);
-      date.setDate(date.getDate() - Math.floor(i / 3));
-      date.setHours(date.getHours() - i);
-      date.setMinutes(Math.floor(Math.random() * 60));
-
-      const random = Math.random();
-      let temp: number, gas: number;
-
-      if (random < 0.3) {
-        // 30% DARURAT
-        temp = Math.floor(Math.random() * 8) + 40; // 40-48°C
-        gas = Math.floor(Math.random() * 400) + 600; // 600-1000 ppm
-      } else if (random < 0.6) {
-        // 30% SIAGA
-        temp = Math.floor(Math.random() * 5) + 36; // 36-40°C
-        gas = Math.floor(Math.random() * 300) + 300; // 300-600 ppm
-      } else {
-        // 40% NORMAL (skip)
-        temp = Math.floor(Math.random() * 17) + 18;
-        gas = Math.floor(Math.random() * 300);
-      }
-
-      const humidity = Math.floor(Math.random() * 40) + 30;
-      const level = determineAlertLevel(temp, gas);
-
-      if (level !== 'NORMAL') {
-        dummyAlerts.push({
-          id: `alert-${i}`,
-          level,
-          deviceName: `Tongkat RelaWand ${(i % 3) + 1}`,
-          temperature: temp,
-          humidity,
-          gasConcentration: gas,
-          date: date.toLocaleDateString('id-ID', { 
-            day: 'numeric', 
-            month: 'long', 
-            year: 'numeric' 
-          }),
-          time: date.toLocaleTimeString('id-ID', { 
-            hour: '2-digit', 
-            minute: '2-digit'
-          }) + ' WIB',
-          timestamp: date.getTime()
-        });
-      }
-    }
-
-    return dummyAlerts.sort((a, b) => b.timestamp - a.timestamp);
+  // Format date and time for display
+  const formatDateTime = (timestamp: Date | string) => {
+    const date = new Date(timestamp);
+    return {
+      date: date.toLocaleDateString('id-ID', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+      }),
+      time: date.toLocaleTimeString('id-ID', {
+        hour: '2-digit',
+        minute: '2-digit'
+      }) + ' WIB'
+    };
   };
 
   useEffect(() => {
@@ -113,65 +66,46 @@ export default function HistoriPeringatanPage() {
 
     checkAuth();
 
-    // Load alerts
+    // Load alerts - only fetch alerts that were shown as popups
     const loadAlerts = async () => {
       setIsLoading(true);
-      
-      // TODO: Replace with actual API call
-      // const response = await fetch('http://localhost:5000/api/alerts', {
-      //   credentials: 'include'
-      // });
-      // const data = await response.json();
-      // setAlerts(data.alerts);
 
-      // Dummy data
-      const dummyData = generateDummyAlerts();
-      setAlerts(dummyData);
-      setIsLoading(false);
+      try {
+        const response = await fetch('http://localhost:5000/api/alerts/history?limit=50', {
+          credentials: 'include'
+        });
+        const data = await response.json();
+
+        if (data.success && data.alerts) {
+          // Transform alerts to match the expected format
+          const transformedAlerts = data.alerts.map((alert: any) => {
+            const { date, time } = formatDateTime(alert.viewedAt || alert.timestamp);
+            return {
+              id: alert._id,
+              level: alert.level,
+              deviceName: alert.deviceName,
+              temperature: alert.temperature,
+              humidity: alert.humidity,
+              gasConcentration: alert.gasConcentration,
+              date,
+              time,
+              timestamp: new Date(alert.viewedAt || alert.timestamp).getTime()
+            };
+          });
+          setAlerts(transformedAlerts);
+        }
+      } catch (error) {
+        console.error('Error fetching alert history:', error);
+      } finally {
+        setIsLoading(false);
+      }
     };
 
     loadAlerts();
 
-    // Simulate new alerts every 30 seconds
+    // Refresh alerts every 30 seconds
     const interval = setInterval(() => {
-      const now = new Date();
-      const random = Math.random();
-      
-      let temp: number, gas: number;
-      
-      if (random < 0.4) {
-        temp = Math.floor(Math.random() * 8) + 40;
-        gas = Math.floor(Math.random() * 400) + 600;
-      } else {
-        temp = Math.floor(Math.random() * 5) + 36;
-        gas = Math.floor(Math.random() * 300) + 300;
-      }
-
-      const humidity = Math.floor(Math.random() * 40) + 30;
-      const level = determineAlertLevel(temp, gas);
-
-      if (level !== 'NORMAL') {
-        const newAlert: Alert = {
-          id: `alert-${Date.now()}`,
-          level,
-          deviceName: `Tongkat RelaWand ${Math.floor(Math.random() * 3) + 1}`,
-          temperature: temp,
-          humidity,
-          gasConcentration: gas,
-          date: now.toLocaleDateString('id-ID', { 
-            day: 'numeric', 
-            month: 'long', 
-            year: 'numeric' 
-          }),
-          time: now.toLocaleTimeString('id-ID', { 
-            hour: '2-digit', 
-            minute: '2-digit'
-          }) + ' WIB',
-          timestamp: now.getTime()
-        };
-
-        setAlerts(prev => [newAlert, ...prev].slice(0, 20));
-      }
+      loadAlerts();
     }, 30000);
 
     return () => clearInterval(interval);
@@ -287,7 +221,7 @@ export default function HistoriPeringatanPage() {
                 </li>
                 <li className="flex items-start">
                   <span className="mr-2">•</span>
-                  <span>Gas: {'<'} 300 ppm</span>
+                  <span>Gas: {'<'} 1000 ppm</span>
                 </li>
               </ul>
             </div>
@@ -315,7 +249,7 @@ export default function HistoriPeringatanPage() {
                 </li>
                 <li className="flex items-start">
                   <span className="mr-2">•</span>
-                  <span>Gas: 300-600 ppm</span>
+                  <span>Gas: 1000-1500 ppm</span>
                 </li>
               </ul>
             </div>
@@ -343,7 +277,7 @@ export default function HistoriPeringatanPage() {
                 </li>
                 <li className="flex items-start">
                   <span className="mr-2">•</span>
-                  <span>Gas: {'>'} 600 ppm</span>
+                  <span>Gas: {'>'} 1500 ppm</span>
                 </li>
               </ul>
             </div>

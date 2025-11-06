@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(npx ts-node:*)",
+      "Bash(mosquitto_pub:*)",
+      "Bash(.env)",
+      "Bash(npm run build:*)",
+      "Bash(npm run db:clear-sensors:*)",
+      "Bash(npm run dev:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
