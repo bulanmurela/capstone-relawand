@@ -126,6 +126,25 @@ html {
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
+/* Chart scroll container custom scrollbar */
+.chart-scroll-container::-webkit-scrollbar {
+  height: 10px;
+}
+
+.chart-scroll-container::-webkit-scrollbar-track {
+  background: #e5e7eb;
+  border-radius: 5px;
+}
+
+.chart-scroll-container::-webkit-scrollbar-thumb {
+  background: #567C8D;
+  border-radius: 5px;
+}
+
+.chart-scroll-container::-webkit-scrollbar-thumb:hover {
+  background: #3d5766;
+}
+
 .leaflet-container {
   z-index: 0;
 }

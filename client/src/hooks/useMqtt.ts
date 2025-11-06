@@ -1,0 +1,139 @@
+import { useEffect, useRef, useState, useCallback } from 'react';
+import mqtt from 'mqtt';
+
+export interface MqttSensorData {
+  temperature: number | null;
+  humidity: number | null;
+  gas_adc: number;
+  gas_ppm: number;
+  voltage: number;
+  alarm: boolean;
+  device_id?: string;
+  timestamp?: string;
+}
+
+interface UseMqttOptions {
+  broker?: string;
+  port?: number;
+  topic?: string;
+  enabled?: boolean;
+}
+
+interface UseMqttReturn {
+  data: MqttSensorData | null;
+  isConnected: boolean;
+  error: string | null;
+  lastUpdate: Date | null;
+}
+
+export function useMqtt(options: UseMqttOptions = {}): UseMqttReturn {
+  const {
+    broker = process.env.NEXT_PUBLIC_MQTT_BROKER || 'test.mosquitto.org',
+    port = parseInt(process.env.NEXT_PUBLIC_MQTT_PORT || '1883', 10),
+    topic = process.env.NEXT_PUBLIC_MQTT_TOPIC || '/topic',
+    enabled = true
+  } = options;
+
+  const [data, setData] = useState<MqttSensorData | null>(null);
+  const [isConnected, setIsConnected] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
+
+  const clientRef = useRef<mqtt.MqttClient | null>(null);
+  const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const connect = useCallback(() => {
+    if (!enabled || clientRef.current?.connected) {
+      return;
+    }
+
+    try {
+      console.log('[MQTT Client] Connecting to:', `ws://${broker}:${port}`);
+
+      const client = mqtt.connect(`ws://${broker}:${port}`, {
+        clientId: `relawand_client_${Math.random().toString(16).substring(2, 8)}`,
+        clean: true,
+        connectTimeout: 10000,
+        reconnectPeriod: 5000,
+        keepalive: 60
+      });
+
+      client.on('connect', () => {
+        console.log('[MQTT Client] ✅ Connected');
+        setIsConnected(true);
+        setError(null);
+
+        client.subscribe(topic, (err) => {
+          if (err) {
+            console.error('[MQTT Client] ❌ Subscription error:', err);
+            setError(`Subscription error: ${err.message}`);
+          } else {
+            console.log('[MQTT Client] ✅ Subscribed to:', topic);
+          }
+        });
+      });
+
+      client.on('message', (_topic, payload) => {
+        try {
+          const parsedData: MqttSensorData = JSON.parse(payload.toString());
+          setData(parsedData);
+          setLastUpdate(new Date());
+          console.log('[MQTT Client] 📩 Data received:', parsedData);
+        } catch (err) {
+          console.error('[MQTT Client] ❌ Parse error:', err);
+        }
+      });
+
+      client.on('error', (err) => {
+        console.error('[MQTT Client] ❌ Error:', err);
+        setError(err.message);
+        setIsConnected(false);
+      });
+
+      client.on('close', () => {
+        console.log('[MQTT Client] 🔌 Disconnected');
+        setIsConnected(false);
+      });
+
+      client.on('reconnect', () => {
+        console.log('[MQTT Client] 🔄 Reconnecting...');
+      });
+
+      clientRef.current = client;
+    } catch (err: any) {
+      console.error('[MQTT Client] ❌ Connection error:', err);
+      setError(err.message);
+      setIsConnected(false);
+
+      // Retry connection after 5 seconds
+      reconnectTimeoutRef.current = setTimeout(() => {
+        connect();
+      }, 5000);
+    }
+  }, [broker, port, topic, enabled]);
+
+  useEffect(() => {
+    if (enabled) {
+      connect();
+    }
+
+    // Cleanup on unmount
+    return () => {
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current);
+      }
+      if (clientRef.current) {
+        console.log('[MQTT Client] Disconnecting...');
+        clientRef.current.end();
+        clientRef.current = null;
+      }
+    };
+  }, [connect, enabled]);
+
+  return {
+    data,
+    isConnected,
+    error,
+    lastUpdate
+  };
+}

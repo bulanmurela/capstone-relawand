@@ -24,7 +24,6 @@ const DeviceSchema: Schema = new Schema({
   deviceId: {
     type: String,
     required: true,
-    unique: true,
     trim: true
   },
   deviceName: {
@@ -92,7 +91,7 @@ const DeviceSchema: Schema = new Schema({
   timestamps: true
 });
 
-DeviceSchema.index({ deviceId: 1 });
+DeviceSchema.index({ deviceId: 1 }, { unique: true });
 DeviceSchema.index({ userId: 1 });
 DeviceSchema.index({ statusDevice: 1 });
 DeviceSchema.index({ lastHeartbeat: -1 });

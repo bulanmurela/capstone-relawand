@@ -5,6 +5,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { AlertProvider } from "@/contexts/AlertContexts";
+import { MqttProvider } from "@/contexts/MqttContext";
 import "leaflet/dist/leaflet.css";
 
 const inter = Inter({
@@ -33,9 +34,11 @@ export default function RootLayout({
       <body className={`${inter.variable} ${nunito.variable} antialiased`}>
         <main>
           <AlertProvider>
-            <Navbar />
-            {children}
-            <Footer />
+            <MqttProvider enabled={true}>
+              <Navbar />
+              {children}
+              <Footer />
+            </MqttProvider>
           </AlertProvider>
         </main>
       </body>

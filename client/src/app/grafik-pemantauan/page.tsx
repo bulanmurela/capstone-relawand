@@ -69,13 +69,13 @@ export default function GrafikPemantauanPage() {
 
         {/* Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-          <GrafikTempHum locationId={device.deviceId} />
-          <GrafikGas locationId={device.deviceId} />
+          <GrafikTempHum locationId={device._id} />
+          <GrafikGas locationId={device._id} />
         </div>
 
         {/* Kamera */}
         <div className="mb-6">
-          <KontainerGambar locationId={device.deviceId} />
+          <KontainerGambar locationId={device._id} />
         </div>
       </div>
     </div>

@@ -18,54 +18,55 @@ export default function CommunicationLog() {
   const [isPaused, setIsPaused] = useState(false);
   const logContainerRef = useRef<HTMLDivElement>(null);
 
-  // Generate dummy log entries
-  const generateDummyLog = (): LogEntry => {
-    const now = new Date();
-    const devices = ['Tongkat 1', 'Tongkat 2', 'Tongkat 3'];
-    const deviceId = Math.floor(Math.random() * 3) + 1;
-    const isReceived = Math.random() > 0.3; // 70% received, 30% sent
+  // Format timestamp for display
+  const formatTimestamp = (timestamp: Date | string) => {
+    const date = new Date(timestamp);
+    return date.toLocaleString('id-ID', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      fractionalSecondDigits: 3
+    });
+  };
 
-    const rawData = isReceived
-      ? `{"temp":${(Math.random() * 20 + 25).toFixed(2)},"hum":${(Math.random() * 40 + 30).toFixed(2)},"co2":${Math.floor(Math.random() * 800)},"timestamp":"${now.toISOString()}"}`
-      : `{"cmd":"GET_STATUS","device_id":"${deviceId}"}`;
+  // Fetch logs from API
+  const fetchLogs = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/api/mqtt-logs?limit=100', {
+        credentials: 'include'
+      });
+      const data = await response.json();
 
-    return {
-      id: `log-${Date.now()}-${Math.random()}`,
-      timestamp: now.toLocaleString('id-ID', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        fractionalSecondDigits: 3
-      }),
-      deviceId: `device-${deviceId}`,
-      deviceName: devices[deviceId - 1],
-      type: isReceived ? 'RECEIVED' : 'SENT',
-      rawData,
-      status: Math.random() > 0.05 ? 'success' : 'error'
-    };
+      if (data.success && data.logs) {
+        const transformedLogs = data.logs.map((log: any) => ({
+          id: log._id,
+          timestamp: formatTimestamp(log.timestamp),
+          deviceId: log.deviceId,
+          deviceName: log.deviceName,
+          type: log.type,
+          rawData: log.payload,
+          status: log.status
+        }));
+        setLogs(transformedLogs);
+      }
+    } catch (error) {
+      console.error('Error fetching MQTT logs:', error);
+    }
   };
 
   useEffect(() => {
-    // Generate initial logs
-    const initialLogs: LogEntry[] = [];
-    for (let i = 0; i < 10; i++) {
-      initialLogs.unshift(generateDummyLog());
-    }
-    setLogs(initialLogs);
+    // Initial fetch
+    fetchLogs();
 
-    // Simulate real-time logs
+    // Poll for new logs
     const interval = setInterval(() => {
       if (!isPaused) {
-        setLogs(prev => {
-          const newLog = generateDummyLog();
-          const updated = [newLog, ...prev];
-          return updated.slice(0, 100); // Keep only last 100 logs
-        });
+        fetchLogs();
       }
-    }, 2000); // New log every 2 seconds
+    }, 3000); // Fetch every 3 seconds
 
     return () => clearInterval(interval);
   }, [isPaused]);

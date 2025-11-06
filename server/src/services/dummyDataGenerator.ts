@@ -12,14 +12,16 @@ export class DummyDataGenerator {
 
   // Generate one reading for a device
   private async generateReading(device: IDevice) {
+    const gas_ppm = this.randomValue(400, 1200);
     const reading = new SensorData({
       deviceId: device._id.toString(),
       timestamp: new Date(),
-      temperature: this.randomValue(25, 35),
-      humidity: this.randomValue(60, 90),
-      co: this.randomValue(50, 150),
-      co2: this.randomValue(400, 800),
-      lpg: this.randomValue(20, 100)
+      temperature: this.randomValue(23, 30),
+      humidity: this.randomValue(60, 85),
+      gas_adc: this.randomValue(350, 500),
+      gas_ppm: gas_ppm,
+      voltage: Math.round((0.25 + Math.random() * 0.2) * 1000) / 1000, // 0.25-0.45V
+      alarm: gas_ppm >= 1000 // Alarm if gas >= 1000 ppm (SIAGA threshold)
     });
 
     await reading.save();
@@ -85,15 +87,17 @@ export class DummyDataGenerator {
 
         for (let i = dataPoints - 1; i >= 0; i--) {
           const timestamp = new Date(now.getTime() - (i * 30 * 60 * 1000));
+          const gas_ppm = this.randomValue(400, 1200);
 
           readings.push({
             deviceId: device._id.toString(),
             timestamp,
-            temperature: this.randomValue(25, 35),
-            humidity: this.randomValue(60, 90),
-            co: this.randomValue(50, 150),
-            co2: this.randomValue(400, 800),
-            lpg: this.randomValue(20, 100)
+            temperature: this.randomValue(23, 30),
+            humidity: this.randomValue(60, 85),
+            gas_adc: this.randomValue(350, 500),
+            gas_ppm: gas_ppm,
+            voltage: Math.round((0.25 + Math.random() * 0.2) * 1000) / 1000,
+            alarm: gas_ppm >= 1000 // Alarm if gas >= 1000 ppm (SIAGA threshold)
           });
         }
 

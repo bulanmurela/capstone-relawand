@@ -9,6 +9,7 @@ type AlertLevel = 'SIAGA' | 'DARURAT';
 interface AlertData {
   level: AlertLevel;
   deviceName: string;
+  deviceId?: string;
   temperature: number;
   humidity: number;
   gasConcentration: number;
@@ -25,9 +26,30 @@ export function AlertProvider({ children }: { children: ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
   const [alertData, setAlertData] = useState<AlertData | null>(null);
 
-  const showAlert = useCallback((data: AlertData) => {
+  const showAlert = useCallback(async (data: AlertData) => {
     setAlertData(data);
     setIsOpen(true);
+
+    // Save alert to backend as viewed
+    try {
+      await fetch('http://localhost:5000/api/alerts/mark-viewed', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          deviceId: data.deviceId,
+          deviceName: data.deviceName,
+          level: data.level,
+          temperature: data.temperature,
+          humidity: data.humidity,
+          gasConcentration: data.gasConcentration
+        })
+      });
+    } catch (error) {
+      console.error('Failed to save alert history:', error);
+    }
   }, []);
 
   const hideAlert = useCallback(() => {
