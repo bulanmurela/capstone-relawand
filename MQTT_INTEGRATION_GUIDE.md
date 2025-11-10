@@ -53,7 +53,7 @@ The backend is **already configured** and running! It:
 ```env
 MQTT_BROKER=test.mosquitto.org
 MQTT_PORT=1883
-MQTT_TOPIC=/topic
+MQTT_TOPIC=pX7bH4gQvWm2L9sNj3ZfYcE1tU8dKrTq
 DEFAULT_DEVICE_ID=STM32-001
 ```
 
@@ -63,7 +63,7 @@ DEFAULT_DEVICE_ID=STM32-001
 ```env
 NEXT_PUBLIC_MQTT_BROKER=test.mosquitto.org
 NEXT_PUBLIC_MQTT_PORT=1883
-NEXT_PUBLIC_MQTT_TOPIC=/topic
+NEXT_PUBLIC_MQTT_TOPIC=pX7bH4gQvWm2L9sNj3ZfYcE1tU8dKrTq
 ```
 
 **Usage in Components**:
@@ -168,7 +168,7 @@ npm run mqtt:publish
 
 Or from your terminal with mosquitto:
 ```bash
-mosquitto_pub -h test.mosquitto.org -t "/topic" -m '{"temperature":25,"humidity":60,"gas_ppm":1000,"gas_adc":450,"voltage":0.37,"alarm":false}'
+mosquitto_pub -h test.mosquitto.org -t "pX7bH4gQvWm2L9sNj3ZfYcE1tU8dKrTq" -m '{"temperature":25,"humidity":60,"gas_ppm":1000,"gas_adc":450,"voltage":0.37,"alarm":false}'
 ```
 
 ### Test Frontend (Dev Mode)

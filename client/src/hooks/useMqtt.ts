@@ -30,7 +30,7 @@ export function useMqtt(options: UseMqttOptions = {}): UseMqttReturn {
   const {
     broker = process.env.NEXT_PUBLIC_MQTT_BROKER || 'test.mosquitto.org',
     port = parseInt(process.env.NEXT_PUBLIC_MQTT_PORT || '1883', 10),
-    topic = process.env.NEXT_PUBLIC_MQTT_TOPIC || '/topic',
+    topic = process.env.NEXT_PUBLIC_MQTT_TOPIC || 'pX7bH4gQvWm2L9sNj3ZfYcE1tU8dKrTq',
     enabled = true
   } = options;
 

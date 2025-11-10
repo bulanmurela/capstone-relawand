@@ -132,7 +132,7 @@ const startServer = async () => {
 
     // Initialize MQTT service
     const mqttBroker = process.env.MQTT_BROKER || 'test.mosquitto.org';
-    const mqttTopic = process.env.MQTT_TOPIC || '/topic';
+    const mqttTopic = process.env.MQTT_TOPIC || 'pX7bH4gQvWm2L9sNj3ZfYcE1tU8dKrTq';
     const mqttPort = parseInt(process.env.MQTT_PORT || '1883', 10);
 
     const mqttService = new MqttService({

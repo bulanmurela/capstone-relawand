@@ -4,7 +4,7 @@ import MqttListener from './services/mqttListener';
 
 // Configuration
 const MQTT_BROKER = process.env.MQTT_BROKER || 'test.mosquitto.org';
-const MQTT_TOPIC = process.env.MQTT_TOPIC || '/topic';
+const MQTT_TOPIC = process.env.MQTT_TOPIC || 'pX7bH4gQvWm2L9sNj3ZfYcE1tU8dKrTq';
 const MQTT_PORT = parseInt(process.env.MQTT_PORT || '1883', 10);
 
 console.log('╔═══════════════════════════════════════════════════════════╗');

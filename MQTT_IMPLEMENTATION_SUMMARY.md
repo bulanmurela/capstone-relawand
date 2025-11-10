@@ -18,7 +18,7 @@
 3. **Environment Configuration** (`server/.env`)
    - `MQTT_BROKER`: Broker address (default: test.mosquitto.org)
    - `MQTT_PORT`: Broker port (default: 1883)
-   - `MQTT_TOPIC`: Topic to subscribe to (default: /topic)
+   - `MQTT_TOPIC`: Topic to subscribe to (default: pX7bH4gQvWm2L9sNj3ZfYcE1tU8dKrTq)
    - `DEFAULT_DEVICE_ID`: Default device ID if not in message
 
 ### Frontend Integration
@@ -141,7 +141,7 @@ function Page() {
 
 ### For Testing (Current Setup)
 - Broker: `test.mosquitto.org`
-- Topic: `/topic`
+- Topic: `pX7bH4gQvWm2L9sNj3ZfYcE1tU8dKrTq`
 - Works from anywhere with internet
 
 ### For Production/Local Network
@@ -208,7 +208,7 @@ NEXT_PUBLIC_MQTT_TOPIC=/relawand/sensor
 
 ✅ Backend MQTT service: **RUNNING**
 ✅ Connected to: `test.mosquitto.org:1883`
-✅ Subscribed to: `/topic`
+✅ Subscribed to: `pX7bH4gQvWm2L9sNj3ZfYcE1tU8dKrTq`
 ✅ MongoDB: **CONNECTED**
 ✅ Saving data: **YES**
 ✅ Frontend hook: **READY**
@@ -219,7 +219,7 @@ NEXT_PUBLIC_MQTT_TOPIC=/relawand/sensor
 Check backend logs for:
 ```
 [MQTT] ✅ Connected to broker
-[MQTT] ✅ Subscribed to topic: /topic
+[MQTT] ✅ Subscribed to topic: pX7bH4gQvWm2L9sNj3ZfYcE1tU8dKrTq
 [MQTT] 👂 Listening for sensor data...
 ```
 
