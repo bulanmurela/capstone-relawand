@@ -37,7 +37,7 @@ Create a `.env` file in the server directory or set environment variables:
 
 ```env
 MQTT_BROKER=test.mosquitto.org
-MQTT_TOPIC=/topic
+MQTT_TOPIC=pX7bH4gQvWm2L9sNj3ZfYcE1tU8dKrTq
 MQTT_PORT=1883
 ```
 
@@ -47,14 +47,14 @@ Open another terminal and publish test messages using mosquitto_pub:
 
 ```bash
 # Send a simple text message
-mosquitto_pub -h test.mosquitto.org -t "/topic" -m "Hello from RelaWand!"
+mosquitto_pub -h test.mosquitto.org -t "pX7bH4gQvWm2L9sNj3ZfYcE1tU8dKrTq" -m "Hello from RelaWand!"
 
 # Send JSON sensor data
-mosquitto_pub -h test.mosquitto.org -t "/topic" -m '{"temperature":25.5,"humidity":60,"timestamp":"2025-11-05T10:30:00Z"}'
+mosquitto_pub -h test.mosquitto.org -t "pX7bH4gQvWm2L9sNj3ZfYcE1tU8dKrTq" -m '{"temperature":25.5,"humidity":60,"timestamp":"2025-11-05T10:30:00Z"}'
 
 # Send multiple messages
-mosquitto_pub -h test.mosquitto.org -t "/topic" -m '{"sensor":"temp","value":23.4}'
-mosquitto_pub -h test.mosquitto.org -t "/topic" -m '{"sensor":"humid","value":58.2}'
+mosquitto_pub -h test.mosquitto.org -t "pX7bH4gQvWm2L9sNj3ZfYcE1tU8dKrTq" -m '{"sensor":"temp","value":23.4}'
+mosquitto_pub -h test.mosquitto.org -t "pX7bH4gQvWm2L9sNj3ZfYcE1tU8dKrTq" -m '{"sensor":"humid","value":58.2}'
 ```
 
 ## Running in Background
@@ -171,7 +171,7 @@ For production, consider:
 1. Check if the broker is accessible:
    ```bash
    # Test with mosquitto_sub
-   mosquitto_sub -h test.mosquitto.org -t "/topic" -v
+   mosquitto_sub -h test.mosquitto.org -t "pX7bH4gQvWm2L9sNj3ZfYcE1tU8dKrTq" -v
    ```
 
 2. Verify firewall settings allow outbound connections on port 1883
