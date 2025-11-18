@@ -146,8 +146,9 @@ const startServer = async () => {
     mqttService.setRealtimeService(realtimeService);
     await mqttService.connect();
 
-    const dummyDataGenerator = new DummyDataGenerator();
-    dummyDataGenerator.start(5); // start generating data every 5 MINUTES
+    // Dummy data generator disabled - waiting for real sensor data from STM32
+    // const dummyDataGenerator = new DummyDataGenerator();
+    // dummyDataGenerator.start(5); // start generating data every 5 MINUTES
 
     httpServer.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);
