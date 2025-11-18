@@ -64,6 +64,48 @@ export default function Login() {
     });
   };
 
+  // Bypass login function with hardcoded valid credentials
+  const handleBypassLogin = async () => {
+    setIsLoading(true);
+    setError('');
+
+    const bypassCredentials = {
+      name: 'Admin Putra',
+      email: 'putrapetugaspantau@relawand.com',
+      password: 'admin123',
+      role: 'Petugas Pantau'
+    };
+
+    console.log('Attempting bypass login with:', bypassCredentials);
+
+    try {
+      const response = await fetch('http://localhost:5000/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(bypassCredentials),
+      });
+
+      console.log('Bypass response status:', response.status);
+      const responseData = await response.json();
+      console.log('Bypass response data:', responseData);
+
+      if (responseData.success) {
+        console.log('Bypass login successful, redirecting to /beranda');
+        window.location.href = '/beranda';
+      } else {
+        setError(`Bypass login gagal: ${responseData.message || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('Bypass login failed:', error);
+      setError('Bypass login gagal. Silakan coba login manual.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-white py-8">
       {/* Container Login */}
@@ -158,6 +200,19 @@ export default function Login() {
                 style={{ fontFamily: 'Nunito, sans-serif' }}
               >
                 {isLoading ? "Memproses..." : "Masuk"}
+              </button>
+            </div>
+
+            {/* Bypass Login Button */}
+            <div className="flex justify-center pt-2">
+              <button
+                type="button"
+                onClick={handleBypassLogin}
+                disabled={isLoading}
+                className="w-[280px] h-[40px] bg-gray-500 hover:bg-gray-600 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors rounded-[25px] text-white text-[14px] font-medium flex items-center justify-center"
+                style={{ fontFamily: 'Nunito, sans-serif' }}
+              >
+                {isLoading ? "Memproses Bypass..." : "Bypass Login → Langsung ke Dashboard"}
               </button>
             </div>
 
