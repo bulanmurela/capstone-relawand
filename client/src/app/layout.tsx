@@ -32,9 +32,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className={`${inter.variable} ${nunito.variable} antialiased`}>
-        <main>
+    <html lang="en" className="dark">
+      <body className={`${inter.variable} ${nunito.variable} antialiased bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 min-h-screen`}>
+        <main className="flex flex-col min-h-screen">
           <NotificationProvider>
             <AlertProvider>
               <MqttProvider enabled={true}>
