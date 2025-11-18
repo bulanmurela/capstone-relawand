@@ -20,7 +20,7 @@ export default function GasConcentrationChart({ locationId }: Props ) {
   const [currentGasPPM, setCurrentGasPPM] = useState(0);
   const [currentVoltage, setCurrentVoltage] = useState(0);
   const [currentAlarm, setCurrentAlarm] = useState(false);
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [timeRange, setTimeRange] = useState<number>(24); // hours
 
   // Real-time updates via MQTT
   const { data: mqttData, isConnected } = useMqttContext();
@@ -28,9 +28,9 @@ export default function GasConcentrationChart({ locationId }: Props ) {
   useEffect(() => {
   const fetchData = async () => {
     try {
-      // Fetch last 50 data points (most recent records)
+      // Fetch data based on time range
       const response = await fetch(
-        `http://localhost:5000/api/sensor-data/${locationId}?limit=50`,
+        `http://localhost:5000/api/sensor-data/${locationId}?hours=${timeRange}`,
         { credentials: 'include' }
       );
 
@@ -73,7 +73,7 @@ export default function GasConcentrationChart({ locationId }: Props ) {
     const interval = setInterval(fetchData, 60 * 1000);
     return () => clearInterval(interval);
   }
-}, [locationId]);
+}, [locationId, timeRange]);
 
   // Handle real-time MQTT sensor data updates
   useEffect(() => {
@@ -92,52 +92,55 @@ export default function GasConcentrationChart({ locationId }: Props ) {
         alarm: mqttData.alarm || false
       };
 
-      // Update chart data with new point (keep last 50 points)
+      // Update chart data with new point
       setData(prevData => {
         const updatedData = [...prevData, newDataPoint];
-        return updatedData.slice(-50); // Keep only last 50 data points
+        // Filter to keep only data within time range
+        const cutoffTime = new Date();
+        cutoffTime.setHours(cutoffTime.getHours() - timeRange);
+        return updatedData.filter(point => {
+          const [hours, minutes, seconds] = point.time.split(':').map(Number);
+          const pointDate = new Date();
+          pointDate.setHours(hours, minutes, seconds);
+          return pointDate >= cutoffTime;
+        });
       });
 
       // Update current values
       setCurrentGasPPM(mqttData.gas_ppm || 0);
       setCurrentVoltage(mqttData.voltage || 0);
       setCurrentAlarm(mqttData.alarm || false);
-
-      // Auto-scroll to the right to show latest data
-      setTimeout(() => {
-        if (scrollContainerRef.current) {
-          scrollContainerRef.current.scrollTo({
-            left: scrollContainerRef.current.scrollWidth,
-            behavior: 'smooth'
-          });
-        }
-      }, 100);
     }
-  }, [mqttData, locationId]);
-
-  // Calculate chart width based on data points (25px per point for better visibility)
-  const chartWidth = Math.max(data.length * 25, 1000);
+  }, [mqttData, locationId, timeRange]);
 
   return (
     <div className="bg-[#567C8D]/15 rounded-[25px] p-6">
-      {/* Title */}
-      <h2
-        className="text-2xl font-bold text-black text-center mb-4"
-        style={{ fontFamily: 'Nunito, sans-serif' }}
-      >
-        Perubahan Konsentrasi Gas
-      </h2>
+      {/* Title and Time Range Selector */}
+      <div className="flex justify-between items-center mb-4">
+        <h2
+          className="text-2xl font-bold text-black"
+          style={{ fontFamily: 'Nunito, sans-serif' }}
+        >
+          Perubahan Konsentrasi Gas
+        </h2>
+        <select
+          value={timeRange}
+          onChange={(e) => setTimeRange(Number(e.target.value))}
+          className="px-4 py-2 rounded-lg border border-gray-300 bg-white text-sm font-medium"
+          style={{ fontFamily: 'Nunito, sans-serif' }}
+        >
+          <option value={1}>1 Jam</option>
+          <option value={6}>6 Jam</option>
+          <option value={12}>12 Jam</option>
+          <option value={24}>24 Jam</option>
+          <option value={48}>2 Hari</option>
+          <option value={168}>7 Hari</option>
+        </select>
+      </div>
 
-      {/* Chart Container with Horizontal Scroll */}
-      <div
-        ref={scrollContainerRef}
-        className="chart-scroll-container bg-white rounded-lg p-2 overflow-x-auto overflow-y-hidden scroll-smooth"
-        style={{
-          scrollbarWidth: 'thin',
-          scrollbarColor: '#567C8D #e5e7eb'
-        }}
-      >
-        <div style={{ minWidth: `${chartWidth}px`, height: '400px' }}>
+      {/* Chart Container - Fixed size, no scroll */}
+      <div className="bg-white rounded-lg p-4">
+        <div style={{ width: '100%', height: '300px' }}>
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={data}>
               <CartesianGrid strokeDasharray="3 3"/>
@@ -145,9 +148,9 @@ export default function GasConcentrationChart({ locationId }: Props ) {
                 dataKey="time"
                 angle={-45}
                 textAnchor="end"
-                interval={0}
-                tick={{ fontSize: 12 }}
-                height={80}
+                interval="preserveStartEnd"
+                tick={{ fontSize: 11 }}
+                height={60}
               />
               <YAxis
                 label={{ value: 'Konsentrasi Gas (ppm)', angle: -90, position: 'insideLeft', style: { fontSize: 14 } }}
@@ -244,7 +247,7 @@ export default function GasConcentrationChart({ locationId }: Props ) {
         className="text-center text-gray-600 text-sm mt-2"
         style={{ fontFamily: 'Nunito, sans-serif' }}
       >
-        {isConnected ? '🟢 Live' : '🔴 Offline'} • Data diperbarui secara real-time • Menampilkan 50 data terakhir
+        {isConnected ? '🟢 Live' : '🔴 Offline'} • Data diperbarui secara real-time • Menampilkan {timeRange} jam terakhir
       </p>
     </div>
   );
