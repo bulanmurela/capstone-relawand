@@ -10,15 +10,16 @@ export default function Footer() {
           {/* Emergency Contacts */}
           <div>
             <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4">
-              Emergency Contacts
+              Kontak Darurat
             </h3>
             <div className="space-y-2">
               {[
-                { number: '113', name: 'Fire Department' },
-                { number: '129', name: 'Disaster Center' },
-                { number: '115', name: 'Search & Rescue' },
-                { number: '110', name: 'Police' },
+                { number: '112', name: 'Polisi' },
+                { number: '113', name: 'Pemadam Kebakaran' },
+                { number: '118', name: 'Ambulans' },
+                { number: '119', name: 'SAR' },
                 { number: '123', name: 'PLN' },
+                { number: '129', name: 'Posko Bencana' },
                 { number: '081221237575', name: 'BNPB' },
               ].map((contact) => (
                 <div key={contact.number} className="flex items-center gap-3">
