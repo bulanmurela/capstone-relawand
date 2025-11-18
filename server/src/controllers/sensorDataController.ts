@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
 import SensorData from '../models/SensorData';
+import Device from '../models/Device';
+import mongoose from 'mongoose';
 
 // Get sensor data for specific device
 export const getSensorData = async (req: Request, res: Response) => {
@@ -7,12 +9,23 @@ export const getSensorData = async (req: Request, res: Response) => {
     const { deviceId } = req.params;
     const { hours, limit, interval } = req.query;
 
+    // Determine if deviceId is MongoDB _id or deviceId string
+    let actualDeviceId = deviceId;
+
+    // If it looks like a MongoDB ObjectId, fetch the device to get its deviceId field
+    if (mongoose.Types.ObjectId.isValid(deviceId) && deviceId.length === 24) {
+      const device = await Device.findById(deviceId);
+      if (device) {
+        actualDeviceId = (device as any).deviceId;
+      }
+    }
+
     let data;
 
     if (limit) {
       // Return the last N records (most recent data points)
       const limitNum = Number(limit);
-      data = await SensorData.find({ deviceId })
+      data = await SensorData.find({ deviceId: actualDeviceId })
         .sort({ timestamp: -1 }) // Newest first
         .limit(limitNum)
         .lean();
@@ -26,7 +39,7 @@ export const getSensorData = async (req: Request, res: Response) => {
       startTime.setHours(startTime.getHours() - hoursNum);
 
       data = await SensorData.find({
-        deviceId,
+        deviceId: actualDeviceId,
         timestamp: { $gte: startTime }
       })
       .sort({ timestamp: 1 }) // Oldest first
@@ -50,7 +63,18 @@ export const getLatestSensorData = async (req: Request, res: Response) => {
   try {
     const { deviceId } = req.params;
 
-    const latest = await SensorData.findOne({ deviceId })
+    // Determine if deviceId is MongoDB _id or deviceId string
+    let actualDeviceId = deviceId;
+
+    // If it looks like a MongoDB ObjectId, fetch the device to get its deviceId field
+    if (mongoose.Types.ObjectId.isValid(deviceId) && deviceId.length === 24) {
+      const device = await Device.findById(deviceId);
+      if (device) {
+        actualDeviceId = (device as any).deviceId;
+      }
+    }
+
+    const latest = await SensorData.findOne({ deviceId: actualDeviceId })
       .sort({ timestamp: -1 })
       .lean();
 
