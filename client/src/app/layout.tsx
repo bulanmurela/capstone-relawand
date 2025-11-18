@@ -6,6 +6,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { AlertProvider } from "@/contexts/AlertContexts";
 import { MqttProvider } from "@/contexts/MqttContext";
+import { NotificationProvider } from "@/contexts/NotificationContext";
 import { Toaster } from "sonner";
 import "leaflet/dist/leaflet.css";
 
@@ -34,13 +35,15 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${inter.variable} ${nunito.variable} antialiased`}>
         <main>
-          <AlertProvider>
-            <MqttProvider enabled={true}>
-              <Navbar />
-              {children}
-              <Footer />
-            </MqttProvider>
-          </AlertProvider>
+          <NotificationProvider>
+            <AlertProvider>
+              <MqttProvider enabled={true}>
+                <Navbar />
+                {children}
+                <Footer />
+              </MqttProvider>
+            </AlertProvider>
+          </NotificationProvider>
           <Toaster position="bottom-right" richColors closeButton />
         </main>
       </body>

@@ -6,6 +6,7 @@ import "leaflet/dist/leaflet.css";
 import { useRouter } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import React from "react";
+import { useNotification } from "@/contexts/NotificationContext";
 
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -79,6 +80,7 @@ export default function MapComponent() {
     const [mounted, setMounted] = useState(false);
     const mapRef = useRef<L.Map | null>(null);
     const router = useRouter();
+    const { showNotification, showConfirm } = useNotification();
     const [deviceList, setDeviceList] =  useState<Device[]>([]);
     const [isLoading, setIsLoading] = useState(false);
 
@@ -182,7 +184,7 @@ export default function MapComponent() {
 
         const unnamed = tempMarkers.filter(m => !m.name.trim());
         if (unnamed.length > 0) {
-            alert('Harap beri nama semua titik lokasi sebelum menambahkan.');
+            showNotification('warning', 'Harap beri nama semua titik lokasi sebelum menambahkan.');
             return;
         }
 
@@ -191,7 +193,7 @@ export default function MapComponent() {
             isNaN(m.lat) || isNaN(m.lng) || m.lat === 0 || m.lng === 0
         );
         if (invalidCoords.length > 0) {
-            alert('Beberapa marker memiliki koordinat yang tidak valid. Silakan tambahkan ulang.');
+            showNotification('error', 'Beberapa marker memiliki koordinat yang tidak valid. Silakan tambahkan ulang.');
             console.error('Invalid markers:', invalidCoords);
             return;
         }
@@ -225,7 +227,7 @@ export default function MapComponent() {
                 if (!response.ok) {
                     const errorData = await response.json();
                     console.error("Error adding device:", errorData);
-                    alert(`Error menambahkan ${marker.name}: ${errorData.error || errorData.message || 'Gagal menambahkan perangkat'}\n\nMohon cek console untuk detail.`);
+                    showNotification('error', `Error menambahkan ${marker.name}: ${errorData.error || errorData.message || 'Gagal menambahkan perangkat'}. Cek console untuk detail.`);
                     break;
                 } else {
                     successCount++;
@@ -241,11 +243,11 @@ export default function MapComponent() {
             if (successCount > 0) {
                 await fetchDevices();
                 setTempMarkers([]);
-                alert(`Berhasil menambahkan ${successCount} perangkat!`);
+                showNotification('success', `Berhasil menambahkan ${successCount} perangkat!`);
             }
         } catch (error) {
             console.error("Error batch adding devices:", error);
-            alert('Gagal menambahkan perangkat. Silakan coba lagi.');
+            showNotification('error', 'Gagal menambahkan perangkat. Silakan coba lagi.');
         } finally {
             setIsLoading(false);
         }
@@ -255,33 +257,37 @@ export default function MapComponent() {
     const handleDeleteDevices = async () => {
         if (selectedForDeletion.length === 0) return;
 
-        if (!confirm(`Apakah Anda yakin ingin menghapus ${selectedForDeletion.length} perangkat?`)) {
-            return;
-        }
+        showConfirm({
+            title: 'Konfirmasi Penghapusan',
+            message: `Apakah Anda yakin ingin menghapus ${selectedForDeletion.length} perangkat?`,
+            confirmText: 'Hapus',
+            cancelText: 'Batal',
+            onConfirm: async () => {
+                try {
+                    for (const deviceId of selectedForDeletion) {
+                        const response = await fetch(`http://localhost:5000/devices/${deviceId}`, {
+                            method: "DELETE",
+                            credentials: 'include',
+                        });
 
-        try {
-            for (const deviceId of selectedForDeletion) {
-                const response = await fetch(`http://localhost:5000/devices/${deviceId}`, {
-                    method: "DELETE",
-                    credentials: 'include',
-                });
+                        if (!response.ok) {
+                            const errorData = await response.json();
+                            console.error("Error deleting device:", errorData);
+                            showNotification('error', `Error menghapus perangkat: ${errorData.message || 'Gagal menghapus'}`);
+                            return;
+                        }
+                    }
 
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    console.error("Error deleting device:", errorData);
-                    alert(`Error deleting device: ${errorData.message || 'Failed to delete'}`);
-                    return;
+                    // Success
+                    await fetchDevices();
+                    setSelectedForDeletion([]);
+                    showNotification('success', `Berhasil menghapus ${selectedForDeletion.length} perangkat!`);
+                } catch (error) {
+                    console.error("Error deleting devices:", error);
+                    showNotification('error', 'Gagal menghapus perangkat. Silakan coba lagi.');
                 }
             }
-
-            // Success
-            await fetchDevices();
-            setSelectedForDeletion([]);
-            alert(`Berhasil menghapus ${selectedForDeletion.length} perangkat!`);
-        } catch (error) {
-            console.error("Error deleting devices:", error);
-            alert('Failed to delete devices. Please try again.');
-        }
+        });
     };
 
     // Toggle selection for deletion
@@ -323,15 +329,15 @@ export default function MapComponent() {
             if (response.ok) {
                 await fetchDevices();
                 setEditingDevice(null);
-                alert('Status berhasil diperbarui!');
+                showNotification('success', 'Status berhasil diperbarui!');
             } else {
                 const errorData = await response.json();
                 console.error('Update error:', errorData);
-                alert(`Error: ${errorData.message || 'Failed to update status'}`);
+                showNotification('error', `Error: ${errorData.message || 'Gagal memperbarui status'}`);
             }
         } catch (error) {
             console.error("Error updating status:", error);
-            alert('Failed to update status. Please try again.');
+            showNotification('error', 'Gagal memperbarui status. Silakan coba lagi.');
         }
     };
 

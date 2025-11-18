@@ -1,12 +1,14 @@
 "use client";
 
 import { useState } from 'react';
+import { useNotification } from '@/contexts/NotificationContext';
 
 interface Props {
     locationId?: number | string;
 }
 
 export default function ForestCamera({ locationId }: Props) {
+  const { showNotification } = useNotification();
   const [isActive, setIsActive] = useState(false);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -31,7 +33,7 @@ export default function ForestCamera({ locationId }: Props) {
       setIsActive(true);
     } catch (error) {
       console.error('Failed to activate camera:', error);
-      alert('Gagal mengaktifkan kamera');
+      showNotification('error', 'Gagal mengaktifkan kamera');
     } finally {
       setIsLoading(false);
     }
