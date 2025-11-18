@@ -14,11 +14,7 @@ export default function Footer() {
             </h3>
             <div className="space-y-2">
               {[
-                { number: '112', name: 'Polisi' },
-                { number: '113', name: 'Pemadam Kebakaran' },
-                { number: '118', name: 'Ambulans' },
-                { number: '119', name: 'SAR' },
-                { number: '123', name: 'PLN' },
+                { number: '119', name: 'SAR Nasional' },
                 { number: '129', name: 'Posko Bencana' },
                 { number: '081221237575', name: 'BNPB' },
               ].map((contact) => (
