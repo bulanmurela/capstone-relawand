@@ -29,8 +29,8 @@ interface UseMqttReturn {
 
 export function useMqtt(options: UseMqttOptions = {}): UseMqttReturn {
   const {
-    broker = process.env.NEXT_PUBLIC_MQTT_BROKER || 'broker.hivemq.com',
-    port = parseInt(process.env.NEXT_PUBLIC_MQTT_PORT || '8884', 10),
+    broker = process.env.NEXT_PUBLIC_MQTT_BROKER || 'broker.emqx.io',
+    port = parseInt(process.env.NEXT_PUBLIC_MQTT_PORT || '8084', 10),
     topic = process.env.NEXT_PUBLIC_MQTT_TOPIC || 'Relawand_F01/sensor/data',
     enabled = true
   } = options;

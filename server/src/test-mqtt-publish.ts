@@ -3,9 +3,9 @@
 import mqtt from 'mqtt';
 
 // Configuration
-const MQTT_BROKER = process.env.MQTT_BROKER || 'broker.hivemq.com';
+const MQTT_BROKER = process.env.MQTT_BROKER || 'broker.emqx.io';
 const MQTT_TOPIC = process.env.MQTT_TOPIC || 'Relawand_F01/sensor/data';
-const MQTT_PORT = parseInt(process.env.MQTT_PORT || '8884', 10);
+const MQTT_PORT = parseInt(process.env.MQTT_PORT || '8084', 10);
 
 console.log('╔═══════════════════════════════════════════════════════════╗');
 console.log('║          RelaWand MQTT Publisher Test                     ║');
