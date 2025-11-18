@@ -6,6 +6,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { AlertProvider } from "@/contexts/AlertContexts";
 import { MqttProvider } from "@/contexts/MqttContext";
+import { Toaster } from "sonner";
 import "leaflet/dist/leaflet.css";
 
 const inter = Inter({
@@ -40,6 +41,7 @@ export default function RootLayout({
               <Footer />
             </MqttProvider>
           </AlertProvider>
+          <Toaster position="bottom-right" richColors closeButton />
         </main>
       </body>
     </html>
