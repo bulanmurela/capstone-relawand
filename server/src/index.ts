@@ -131,8 +131,8 @@ const startServer = async () => {
     setRealtimeService(realtimeService);
 
     // Initialize MQTT service
-    const mqttBroker = process.env.MQTT_BROKER || 'test.mosquitto.org';
-    const mqttTopic = process.env.MQTT_TOPIC || 'pX7bH4gQvWm2L9sNj3ZfYcE1tU8dKrTq';
+    const mqttBroker = process.env.MQTT_BROKER || 'broker.hivemq.com';
+    const mqttTopic = process.env.MQTT_TOPIC || 'Relawand_F01/sensor/data';
     const mqttPort = parseInt(process.env.MQTT_PORT || '1883', 10);
 
     const mqttService = new MqttService({

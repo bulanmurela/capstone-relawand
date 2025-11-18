@@ -12,7 +12,18 @@
       "Bash(git commit:*)",
       "Bash(git rm:*)",
       "Bash(git push:*)",
-      "Bash(gh:*)"
+      "Bash(gh:*)",
+      "Bash(cat:*)",
+      "Bash(git remote set-url:*)",
+      "Bash(curl:*)",
+      "Bash(git config:*)",
+      "Bash(git pull:*)",
+      "Bash(ping:*)",
+      "Bash(telnet:*)",
+      "WebSearch",
+      "WebFetch(domain:www.hivemq.com)",
+      "WebFetch(domain:www.mqtt-dashboard.com)",
+      "Bash(npm run mqtt:listen:*)"
     ],
     "deny": [],
     "ask": []

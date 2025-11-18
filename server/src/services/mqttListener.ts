@@ -26,12 +26,17 @@ class MqttListener {
     console.log(`[MQTT] Connecting to broker: ${broker}:${port}`);
     console.log(`[MQTT] Topic: ${topic}`);
 
+    // Port 1883: Standard MQTT TCP
+    // Port 8883: MQTT over TLS
+    const protocol = port === 8883 ? 'mqtts://' : 'mqtt://';
+
     // Connect to MQTT broker
-    this.client = mqtt.connect(`mqtt://${broker}:${port}`, {
+    this.client = mqtt.connect(`${protocol}${broker}:${port}`, {
       clientId: `relawand_${Math.random().toString(16).substring(2, 8)}`,
       clean: true,
-      connectTimeout: 4000,
-      reconnectPeriod: 1000
+      connectTimeout: 10000,
+      reconnectPeriod: 5000,
+      keepalive: 60
     });
 
     // Handle connection

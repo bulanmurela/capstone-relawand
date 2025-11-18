@@ -30,9 +30,9 @@ interface UseMqttReturn {
 
 export function useMqtt(options: UseMqttOptions = {}): UseMqttReturn {
   const {
-    broker = process.env.NEXT_PUBLIC_MQTT_BROKER || 'test.mosquitto.org',
-    port = parseInt(process.env.NEXT_PUBLIC_MQTT_PORT || '1883', 10),
-    topic = process.env.NEXT_PUBLIC_MQTT_TOPIC || 'pX7bH4gQvWm2L9sNj3ZfYcE1tU8dKrTq',
+    broker = process.env.NEXT_PUBLIC_MQTT_BROKER || 'broker.hivemq.com',
+    port = parseInt(process.env.NEXT_PUBLIC_MQTT_PORT || '8884', 10),
+    topic = process.env.NEXT_PUBLIC_MQTT_TOPIC || 'Relawand_F01/sensor/data',
     enabled = true
   } = options;
 
@@ -51,9 +51,9 @@ export function useMqtt(options: UseMqttOptions = {}): UseMqttReturn {
     }
 
     try {
-      console.log('[MQTT Client] Connecting to:', `ws://${broker}:${port}`);
+      console.log('[MQTT Client] Connecting to:', `wss://${broker}:${port}`);
 
-      const client = mqtt.connect(`ws://${broker}:${port}`, {
+      const client = mqtt.connect(`wss://${broker}:${port}`, {
         clientId: `relawand_client_${Math.random().toString(16).substring(2, 8)}`,
         clean: true,
         connectTimeout: 10000,

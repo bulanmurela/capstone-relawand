@@ -3,9 +3,9 @@
 import mqtt from 'mqtt';
 
 // Configuration
-const MQTT_BROKER = process.env.MQTT_BROKER || 'test.mosquitto.org';
-const MQTT_TOPIC = process.env.MQTT_TOPIC || 'pX7bH4gQvWm2L9sNj3ZfYcE1tU8dKrTq';
-const MQTT_PORT = parseInt(process.env.MQTT_PORT || '1883', 10);
+const MQTT_BROKER = process.env.MQTT_BROKER || 'broker.hivemq.com';
+const MQTT_TOPIC = process.env.MQTT_TOPIC || 'Relawand_F01/sensor/data';
+const MQTT_PORT = parseInt(process.env.MQTT_PORT || '8884', 10);
 
 console.log('╔═══════════════════════════════════════════════════════════╗');
 console.log('║          RelaWand MQTT Publisher Test                     ║');
@@ -42,10 +42,12 @@ const sampleData = [
 
 // Connect to broker
 console.log('Connecting to broker...');
-const client = mqtt.connect(`mqtt://${MQTT_BROKER}:${MQTT_PORT}`, {
+const protocol = MQTT_PORT === 8883 ? 'mqtts://' : 'mqtt://';
+const client = mqtt.connect(`${protocol}${MQTT_BROKER}:${MQTT_PORT}`, {
   clientId: `relawand_publisher_${Math.random().toString(16).substring(2, 8)}`,
   clean: true,
-  connectTimeout: 4000
+  connectTimeout: 10000,
+  keepalive: 60
 });
 
 client.on('connect', () => {
