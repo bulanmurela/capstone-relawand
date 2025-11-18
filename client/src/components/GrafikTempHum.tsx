@@ -133,7 +133,7 @@ export default function TemperatureHumidityChart({ locationId }: Props) {
       {/* Chart Container - Fixed size, no scroll */}
       <div className="bg-white rounded-lg p-4">
         <div style={{ width: '100%', height: '300px' }}>
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height="100%" key={`chart-${timeRange}-${data.length}`}>
             <LineChart data={data}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis
