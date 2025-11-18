@@ -109,6 +109,13 @@ export default function Login() {
   // Demo mode - skip authentication entirely
   const handleDemoMode = () => {
     console.log('Entering demo mode, redirecting to /beranda');
+    // Set demo mode flag in localStorage
+    localStorage.setItem('demoMode', 'true');
+    localStorage.setItem('demoUser', JSON.stringify({
+      name: 'Demo User',
+      email: 'demo@relawand.com',
+      role: 'Demo'
+    }));
     window.location.href = '/beranda';
   };
 

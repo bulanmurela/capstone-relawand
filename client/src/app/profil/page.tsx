@@ -16,6 +16,17 @@ export default function ProfileContainer() {
   useEffect(() => {
     setMounted(true);
 
+    // Check if in demo mode
+    const demoMode = localStorage.getItem('demoMode');
+    if (demoMode === 'true') {
+      console.log('Demo mode active on profile page');
+      const demoUser = localStorage.getItem('demoUser');
+      if (demoUser) {
+        setUserData(JSON.parse(demoUser));
+      }
+      return;
+    }
+
     // Check authentication with backend
     const checkAuth = async () => {
       try {
@@ -46,6 +57,16 @@ export default function ProfileContainer() {
 
   const handleLogout = async () => {
     setIsLoading(true);
+
+    // Check if in demo mode
+    const demoMode = localStorage.getItem('demoMode');
+    if (demoMode === 'true') {
+      // Clear demo mode data
+      localStorage.removeItem('demoMode');
+      localStorage.removeItem('demoUser');
+      window.location.href = '/login';
+      return;
+    }
 
     try {
       await fetch('http://localhost:5000/login/logout', {

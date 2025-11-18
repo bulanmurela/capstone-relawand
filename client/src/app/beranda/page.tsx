@@ -34,6 +34,17 @@ export default function Beranda() {
   useEffect(() => {
     setMounted(true);
 
+    // Check if in demo mode
+    const demoMode = localStorage.getItem('demoMode');
+    if (demoMode === 'true') {
+      console.log('Demo mode active, skipping authentication');
+      const demoUser = localStorage.getItem('demoUser');
+      if (demoUser) {
+        setUserData(JSON.parse(demoUser));
+      }
+      return;
+    }
+
     // Check authentication with backend
     const checkAuth = async () => {
       try {
