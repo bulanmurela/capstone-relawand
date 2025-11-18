@@ -145,15 +145,17 @@ export default function GrafikPemantauanPage() {
           </p>
         </div>
 
-        {/* Charts */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-          <GrafikTempHum locationId={device._id} />
-          <GrafikGas locationId={device._id} />
-        </div>
-
-        {/* Kamera */}
-        <div className="mb-6">
-          <KontainerGambar locationId={device._id} />
+        {/* Charts - 3 rows layout */}
+        <div className="space-y-6">
+          <div className="w-full">
+            <GrafikTempHum locationId={device._id} />
+          </div>
+          <div className="w-full">
+            <GrafikGas locationId={device._id} />
+          </div>
+          <div className="w-full">
+            <KontainerGambar locationId={device._id} />
+          </div>
         </div>
       </div>
     </div>
