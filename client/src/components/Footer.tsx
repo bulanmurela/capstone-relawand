@@ -31,13 +31,13 @@ export default function Footer() {
           {/* Related Organizations */}
           <div>
             <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4">
-              Related Organizations
+              Organisasi Terkait
             </h3>
             <div className="space-y-3">
               {[
-                { name: 'BNPB', full: 'National Disaster Management Agency' },
-                { name: 'KLHK', full: 'Ministry of Environment and Forestry' },
-                { name: 'LPPH', full: 'Forest Damage Prevention Agency' },
+                { name: 'BNPB', full: 'Badan Nasional Penanggulangan Bencana' },
+                { name: 'KLHK', full: 'Kementerian Lingkungan Hidup dan Kehutanan' },
+                { name: 'BPBD', full: 'Badan Penanggulangan Bencana Daerah' },
               ].map((org) => (
                 <div key={org.name}>
                   <div className="font-semibold text-gray-900 text-sm">{org.name}</div>
@@ -50,7 +50,7 @@ export default function Footer() {
           {/* System Info */}
           <div>
             <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4">
-              System Information
+              Informasi Sistem
             </h3>
             <div className="space-y-3">
               <div>
@@ -58,14 +58,14 @@ export default function Footer() {
                 <div className="font-semibold text-gray-900">RelaWand IoT Monitoring</div>
               </div>
               <div>
-                <div className="text-xs text-gray-500 mb-1">Version</div>
+                <div className="text-xs text-gray-500 mb-1">Versi</div>
                 <div className="font-mono font-semibold text-gray-900">v1.0.0</div>
               </div>
               <div>
                 <div className="text-xs text-gray-500 mb-1">Status</div>
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span className="font-medium text-gray-900">Operational</span>
+                  <span className="font-medium text-gray-900">Operasional</span>
                 </div>
               </div>
             </div>
@@ -76,10 +76,10 @@ export default function Footer() {
         <div className="mt-8 pt-6 border-t border-gray-200">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="text-sm text-gray-600">
-              © 2025 RelaWand. IoT-based Landslide Monitoring System.
+              © 2025 RelaWand. Sistem Monitoring Tanah Longsor Berbasis IoT.
             </div>
             <div className="flex items-center gap-2 text-xs text-gray-500">
-              <span>Powered by</span>
+              <span>Didukung oleh</span>
               <span className="font-mono font-semibold text-gray-700">STM32</span>
               <span>•</span>
               <span className="font-mono font-semibold text-gray-700">MQTT</span>
