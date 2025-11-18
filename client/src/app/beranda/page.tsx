@@ -107,7 +107,7 @@ export default function Beranda() {
           </div>
           <div>
             <button onClick={testAlert}>
-              Test Alert SIAGA
+              {/* Test Alert SIAGA */}
             </button>
             {/* Rest of page content */}
           </div>
