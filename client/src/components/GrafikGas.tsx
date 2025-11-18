@@ -26,54 +26,54 @@ export default function GasConcentrationChart({ locationId }: Props ) {
   const { data: mqttData, isConnected } = useMqttContext();
 
   useEffect(() => {
-  const fetchData = async () => {
-    try {
-      // Fetch data based on time range
-      const response = await fetch(
-        `http://localhost:5000/api/sensor-data/${locationId}?hours=${timeRange}`,
-        { credentials: 'include' }
-      );
+    if (!locationId) return;
 
-      if (response.ok) {
-        const apiData = await response.json();
+    const fetchData = async () => {
+      try {
+        // Fetch data based on time range
+        const response = await fetch(
+          `http://localhost:5000/api/sensor-data/${locationId}?hours=${timeRange}`,
+          { credentials: 'include' }
+        );
 
-        // Transform to chart format
-        const chartData = apiData.map((item: any) => ({
-          time: new Date(item.timestamp).toLocaleTimeString('id-ID', {
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-            hour12: false
-          }),
-          gas_ppm: item.gas_ppm || 0,
-          gas_adc: item.gas_adc || 0,
-          voltage: item.voltage || 0,
-          alarm: item.alarm || false
-        }));
+        if (response.ok) {
+          const apiData = await response.json();
 
-        setData(chartData);
+          // Transform to chart format
+          const chartData = apiData.map((item: any) => ({
+            time: new Date(item.timestamp).toLocaleTimeString('id-ID', {
+              hour: '2-digit',
+              minute: '2-digit',
+              second: '2-digit',
+              hour12: false
+            }),
+            gas_ppm: item.gas_ppm || 0,
+            gas_adc: item.gas_adc || 0,
+            voltage: item.voltage || 0,
+            alarm: item.alarm || false
+          }));
 
-        // Set current values
-        if (chartData.length > 0) {
-          const latest = chartData[chartData.length - 1];
-          setCurrentGasPPM(latest.gas_ppm);
-          setCurrentVoltage(latest.voltage);
-          setCurrentAlarm(latest.alarm);
+          setData(chartData);
+
+          // Set current values
+          if (chartData.length > 0) {
+            const latest = chartData[chartData.length - 1];
+            setCurrentGasPPM(latest.gas_ppm);
+            setCurrentVoltage(latest.voltage);
+            setCurrentAlarm(latest.alarm);
+          }
         }
+      } catch (error) {
+        console.error('Error fetching gas data:', error);
       }
-    } catch (error) {
-      console.error('Error fetching gas data:', error);
-    }
-  };
+    };
 
-  if (locationId) {
     fetchData();
 
     // Refresh every 1 minute to keep data up to date
     const interval = setInterval(fetchData, 60 * 1000);
     return () => clearInterval(interval);
-  }
-}, [locationId, timeRange]);
+  }, [locationId, timeRange]);
 
   // Handle real-time MQTT sensor data updates
   useEffect(() => {

@@ -24,51 +24,51 @@ export default function TemperatureHumidityChart({ locationId }: Props) {
   const { data: mqttData, isConnected } = useMqttContext();
 
   useEffect(() => {
-  const fetchData = async () => {
-    try {
-      // Fetch data based on time range
-      const response = await fetch(
-        `http://localhost:5000/api/sensor-data/${locationId}?hours=${timeRange}`,
-        { credentials: 'include' }
-      );
+    if (!locationId) return;
 
-      if (response.ok) {
-        const apiData = await response.json();
+    const fetchData = async () => {
+      try {
+        // Fetch data based on time range
+        const response = await fetch(
+          `http://localhost:5000/api/sensor-data/${locationId}?hours=${timeRange}`,
+          { credentials: 'include' }
+        );
 
-        // Transform to chart format
-        const chartData = apiData.map((item: any) => ({
-          time: new Date(item.timestamp).toLocaleTimeString('id-ID', {
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-            hour12: false
-          }),
-          temperature: item.temperature || 0,
-          humidity: item.humidity || 0
-        }));
+        if (response.ok) {
+          const apiData = await response.json();
 
-        setData(chartData);
+          // Transform to chart format
+          const chartData = apiData.map((item: any) => ({
+            time: new Date(item.timestamp).toLocaleTimeString('id-ID', {
+              hour: '2-digit',
+              minute: '2-digit',
+              second: '2-digit',
+              hour12: false
+            }),
+            temperature: item.temperature || 0,
+            humidity: item.humidity || 0
+          }));
 
-        // Set current values
-        if (chartData.length > 0) {
-          const latest = chartData[chartData.length - 1];
-          setCurrentTemp(latest.temperature);
-          setCurrentHumidity(latest.humidity);
+          setData(chartData);
+
+          // Set current values
+          if (chartData.length > 0) {
+            const latest = chartData[chartData.length - 1];
+            setCurrentTemp(latest.temperature);
+            setCurrentHumidity(latest.humidity);
+          }
         }
+      } catch (error) {
+        console.error('Error fetching sensor data:', error);
       }
-    } catch (error) {
-      console.error('Error fetching sensor data:', error);
-    }
-  };
+    };
 
-  if (locationId) {
     fetchData();
 
     // Refresh every 1 minute to keep data up to date
     const interval = setInterval(fetchData, 60 * 1000);
     return () => clearInterval(interval);
-  }
-}, [locationId, timeRange]);
+  }, [locationId, timeRange]);
 
   // Handle real-time MQTT sensor data updates
   useEffect(() => {
