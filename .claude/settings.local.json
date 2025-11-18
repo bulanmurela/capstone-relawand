@@ -23,7 +23,11 @@
       "WebSearch",
       "WebFetch(domain:www.hivemq.com)",
       "WebFetch(domain:www.mqtt-dashboard.com)",
-      "Bash(npm run mqtt:listen:*)"
+      "Bash(npm run mqtt:listen:*)",
+      "Bash(npx tsc:*)",
+      "Bash(find:*)",
+      "Bash(npm run db:count-sensors:*)",
+      "Bash(node -e:*)"
     ],
     "deny": [],
     "ask": []

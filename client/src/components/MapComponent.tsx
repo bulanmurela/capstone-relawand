@@ -124,7 +124,13 @@ export default function MapComponent() {
     const fetchDevices = async () => {
     setIsLoading(true);
     try {
-        const response = await fetch("http://localhost:5000/devices", {
+        // Check if in demo mode
+        const demoMode = localStorage.getItem('demoMode') === 'true';
+        const url = demoMode
+            ? "http://localhost:5000/devices?isDemo=true"
+            : "http://localhost:5000/devices?isDemo=false";
+
+        const response = await fetch(url, {
         method: "GET",
         credentials: "include"
         });

@@ -31,7 +31,7 @@ export const createDevice = async (req: Request, res: Response) => {
 
 export const getDevices = async (req: Request, res: Response) => {
   try {
-    const { statusDevice, userId, isActive, limit = 100, page = 1 } = req.query;
+    const { statusDevice, userId, isActive, isDemo, limit = 100, page = 1 } = req.query;
 
     const query: any = {};
 
@@ -45,6 +45,10 @@ export const getDevices = async (req: Request, res: Response) => {
 
     if (isActive !== undefined) {
       query.isActive = isActive === 'true';
+    }
+
+    if (isDemo !== undefined) {
+      query.isDemo = isDemo === 'true';
     }
 
     const skip = (Number(page) - 1) * Number(limit);
@@ -224,14 +228,25 @@ export const deleteDevice = async (req: Request, res: Response) => {
 
 export const getDeviceStatusSummary = async (req: Request, res: Response) => {
   try {
-    const statusSummary = await Device.aggregate([
-      {
-        $group: {
-          _id: '$statusDevice',
-          count: { $sum: 1 }
-        }
+    const { isDemo } = req.query;
+
+    const matchStage: any = {};
+    if (isDemo !== undefined) {
+      matchStage.isDemo = isDemo === 'true';
+    }
+
+    const pipeline: any[] = [];
+    if (Object.keys(matchStage).length > 0) {
+      pipeline.push({ $match: matchStage });
+    }
+    pipeline.push({
+      $group: {
+        _id: '$statusDevice',
+        count: { $sum: 1 }
       }
-    ]);
+    });
+
+    const statusSummary = await Device.aggregate(pipeline);
 
     const summary = {
       online: 0,

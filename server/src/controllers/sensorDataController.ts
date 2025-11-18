@@ -7,17 +7,29 @@ import mongoose from 'mongoose';
 export const getSensorData = async (req: Request, res: Response) => {
   try {
     const { deviceId } = req.params;
-    const { hours, limit, interval } = req.query;
+    const { hours, limit, interval, isDemo } = req.query;
 
     // Determine if deviceId is MongoDB _id or deviceId string
     let actualDeviceId = deviceId;
+    let deviceIsDemo = false;
 
     // If it looks like a MongoDB ObjectId, fetch the device to get its deviceId field
     if (mongoose.Types.ObjectId.isValid(deviceId) && deviceId.length === 24) {
       const device = await Device.findById(deviceId);
       if (device) {
         actualDeviceId = (device as any).deviceId;
+        deviceIsDemo = (device as any).isDemo || false;
       }
+    }
+
+    // Build query
+    const query: any = { deviceId: actualDeviceId };
+
+    // Use isDemo from query parameter if provided, otherwise use device's isDemo flag
+    if (isDemo !== undefined) {
+      query.isDemo = isDemo === 'true';
+    } else {
+      query.isDemo = deviceIsDemo;
     }
 
     let data;
@@ -25,7 +37,7 @@ export const getSensorData = async (req: Request, res: Response) => {
     if (limit) {
       // Return the last N records (most recent data points)
       const limitNum = Number(limit);
-      data = await SensorData.find({ deviceId: actualDeviceId })
+      data = await SensorData.find(query)
         .sort({ timestamp: -1 }) // Newest first
         .limit(limitNum)
         .lean();
@@ -39,7 +51,7 @@ export const getSensorData = async (req: Request, res: Response) => {
       startTime.setHours(startTime.getHours() - hoursNum);
 
       data = await SensorData.find({
-        deviceId: actualDeviceId,
+        ...query,
         timestamp: { $gte: startTime }
       })
       .sort({ timestamp: 1 }) // Oldest first
@@ -62,19 +74,32 @@ export const getSensorData = async (req: Request, res: Response) => {
 export const getLatestSensorData = async (req: Request, res: Response) => {
   try {
     const { deviceId } = req.params;
+    const { isDemo } = req.query;
 
     // Determine if deviceId is MongoDB _id or deviceId string
     let actualDeviceId = deviceId;
+    let deviceIsDemo = false;
 
     // If it looks like a MongoDB ObjectId, fetch the device to get its deviceId field
     if (mongoose.Types.ObjectId.isValid(deviceId) && deviceId.length === 24) {
       const device = await Device.findById(deviceId);
       if (device) {
         actualDeviceId = (device as any).deviceId;
+        deviceIsDemo = (device as any).isDemo || false;
       }
     }
 
-    const latest = await SensorData.findOne({ deviceId: actualDeviceId })
+    // Build query
+    const query: any = { deviceId: actualDeviceId };
+
+    // Use isDemo from query parameter if provided, otherwise use device's isDemo flag
+    if (isDemo !== undefined) {
+      query.isDemo = isDemo === 'true';
+    } else {
+      query.isDemo = deviceIsDemo;
+    }
+
+    const latest = await SensorData.findOne(query)
       .sort({ timestamp: -1 })
       .lean();
 

@@ -1,18 +1,19 @@
 // server/src/models/Alert.ts
-import mongoose from 'mongoose';
+import mongoose, { Document } from 'mongoose';
 
-export interface IAlertLog {
+export interface IAlertLog extends Document {
   deviceId: mongoose.Types.ObjectId | string;
   deviceName: string;
   level: 'NORMAL' | 'SIAGA' | 'DARURAT';
   temperature: number;
   humidity: number;
   gasConcentration: number;
-  timestamp?: Date;
-  isViewed?: boolean;
-  viewedAt?: Date;
-  createdAt?: Date;
-  updatedAt?: Date;
+  timestamp: Date;
+  isViewed: boolean;
+  viewedAt?: Date | null;
+  isDemo: boolean;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 const alertSchema = new mongoose.Schema({
@@ -53,9 +54,14 @@ const alertSchema = new mongoose.Schema({
   viewedAt: {
     type: Date,
     required: false
+  },
+  isDemo: {
+    type: Boolean,
+    default: false,
+    index: true
   }
 }, {
   timestamps: true
 });
 
-export default mongoose.model('Alert', alertSchema);
+export default mongoose.model<IAlertLog>('Alert', alertSchema);

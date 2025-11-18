@@ -49,11 +49,14 @@ const SensorDataSchema = new Schema({
     type: Boolean,
     required: true,
     default: false
+  },
+  isDemo: {
+    type: Boolean,
+    default: false,
+    index: true
   }
 }, {
-  timestamps: true,
-  // auto-delete data older than 7 days to save space
-  expires: '7d'
+  timestamps: true
 });
 
 // Compound index for efficient queries

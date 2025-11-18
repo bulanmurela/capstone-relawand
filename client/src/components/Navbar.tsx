@@ -3,9 +3,17 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
+import { useState, useEffect } from 'react';
 
 export default function Navbar() {
   const pathname = usePathname();
+  const [isDemoMode, setIsDemoMode] = useState(false);
+
+  useEffect(() => {
+    // Check if in demo mode
+    const demoMode = localStorage.getItem('demoMode') === 'true';
+    setIsDemoMode(demoMode);
+  }, []);
 
   const navItems = [
     { name: 'Dashboard', path: '/beranda' },

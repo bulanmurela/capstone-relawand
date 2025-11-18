@@ -18,7 +18,13 @@ export default function GrafikPemantauanPage() {
   useEffect(() => {
     const fetchDevices = async () => {
       try {
-        const res = await fetch("http://localhost:5000/devices", {
+        // Check if in demo mode
+        const demoMode = localStorage.getItem('demoMode') === 'true';
+        const url = demoMode
+          ? "http://localhost:5000/devices?isDemo=true"
+          : "http://localhost:5000/devices?isDemo=false";
+
+        const res = await fetch(url, {
           credentials: "include",
         });
         if (!res.ok) throw new Error("Failed to fetch devices");

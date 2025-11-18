@@ -31,6 +31,7 @@ export const getAlertLogs = async (req: Request, res: Response) => {
       severity,
       startDate,
       endDate,
+      isDemo,
       limit = 100,
       page = 1
     } = req.query;
@@ -59,6 +60,10 @@ export const getAlertLogs = async (req: Request, res: Response) => {
 
     if (severity) {
       query.severity = Number(severity);
+    }
+
+    if (isDemo !== undefined) {
+      query.isDemo = isDemo === 'true';
     }
 
     if (startDate || endDate) {
@@ -332,18 +337,24 @@ export const getAlertSummary = async (req: Request, res: Response) => {
 
 export const getActiveAlerts = async (req: Request, res: Response) => {
   try {
-    const { limit = 100, page = 1 } = req.query;
+    const { isDemo, limit = 100, page = 1 } = req.query;
 
     const skip = (Number(page) - 1) * Number(limit);
 
+    const query: any = { isResolved: false };
+
+    if (isDemo !== undefined) {
+      query.isDemo = isDemo === 'true';
+    }
+
     const activeAlerts = await AlertLog
-      .find({ isResolved: false })
+      .find(query)
       .populate('userId', 'username email firstName lastName')
       .sort({ severity: -1, alertTime: -1 })
       .skip(skip)
       .limit(Number(limit));
 
-    const total = await AlertLog.countDocuments({ isResolved: false });
+    const total = await AlertLog.countDocuments(query);
 
     res.json({
       success: true,

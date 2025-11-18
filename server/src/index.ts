@@ -19,6 +19,7 @@ import alertLogRoutes from './routes/alertRoute';
 import loginRoute from './routes/loginRoute';
 import deviceRoute from './routes/deviceRoute';
 import mqttLogRoute from './routes/mqttLogRoute';
+import mqttRoute from './routes/mqttRoute';
 
 dotenv.config();
 
@@ -90,6 +91,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/alerts', alertLogRoutes);
 app.use('/api/sensor-data', sensorDataRoute);
 app.use('/api/mqtt-logs', mqttLogRoute);
+app.use('/api/mqtt', mqttRoute);
 
 // Health check
 app.get('/api/health', (req, res) => {

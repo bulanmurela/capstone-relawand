@@ -2,6 +2,7 @@ import mongoose, { Document, Schema } from 'mongoose';
 
 export interface IDevice extends Document {
   _id: mongoose.Types.ObjectId;
+  deviceId: string;
   deviceName: string;
   deviceType: string;
   location?: {
@@ -16,6 +17,7 @@ export interface IDevice extends Document {
   signalStrength?: number;
   userId: mongoose.Types.ObjectId;
   isActive: boolean;
+  isDemo: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -86,6 +88,10 @@ const DeviceSchema: Schema = new Schema({
   isActive: {
     type: Boolean,
     default: true
+  },
+  isDemo: {
+    type: Boolean,
+    default: false
   }
 }, {
   timestamps: true
