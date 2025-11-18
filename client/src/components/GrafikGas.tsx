@@ -32,7 +32,7 @@ export default function GasConcentrationChart({ locationId }: Props ) {
       try {
         // Fetch data based on time range
         const response = await fetch(
-          `http://localhost:5000/api/sensor-data/${locationId}?hours=${timeRange}`,
+          `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/sensor-data/${locationId}?hours=${timeRange}`,
           { credentials: 'include' }
         );
 

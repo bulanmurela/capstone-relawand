@@ -27,7 +27,7 @@ export function useRealtimeSensorData(options: UseRealtimeSensorDataOptions = {}
   useEffect(() => {
     if (!enabled) return;
 
-    const serverUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+    const serverUrl = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
     console.log('[Socket.IO] Connecting to:', serverUrl);
 

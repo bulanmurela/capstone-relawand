@@ -127,8 +127,8 @@ export default function MapComponent() {
         // Check if in demo mode
         const demoMode = localStorage.getItem('demoMode') === 'true';
         const url = demoMode
-            ? "http://localhost:5000/devices?isDemo=true"
-            : "http://localhost:5000/devices?isDemo=false";
+            ? process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/devices?isDemo=true"
+            : process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/devices?isDemo=false";
 
         const response = await fetch(url, {
         method: "GET",
@@ -223,7 +223,7 @@ export default function MapComponent() {
                 console.log('Creating device:', newDevice);
                 console.log('Marker data:', marker);
 
-                const response = await fetch("http://localhost:5000/devices", {
+                const response = await fetch(process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/devices", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     credentials: 'include',
@@ -271,7 +271,7 @@ export default function MapComponent() {
             onConfirm: async () => {
                 try {
                     for (const deviceId of selectedForDeletion) {
-                        const response = await fetch(`http://localhost:5000/devices/${deviceId}`, {
+                        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/devices/${deviceId}`, {
                             method: "DELETE",
                             credentials: 'include',
                         });
@@ -325,7 +325,7 @@ export default function MapComponent() {
 
             console.log('Updating device status:', updateData);
 
-            const response = await fetch(`http://localhost:5000/devices/${editingDevice._id}`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/devices/${editingDevice._id}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 credentials: 'include',

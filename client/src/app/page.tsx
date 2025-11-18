@@ -14,7 +14,7 @@ export default function Home() {
     // Check authentication with backend
     const checkAuth = async () => {
       try {
-        const response = await fetch('http://localhost:5000/login/check', {
+        const response = await fetch(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/login/check', {
           method: 'GET',
           credentials: 'include',
         });

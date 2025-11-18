@@ -47,7 +47,7 @@ export default function HistoriPeringatanPage() {
     // Check authentication
     const checkAuth = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/auth/check', {
+        const response = await fetch(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/auth/check', {
           method: 'GET',
           credentials: 'include',
         });
@@ -71,7 +71,7 @@ export default function HistoriPeringatanPage() {
       setIsLoading(true);
 
       try {
-        const response = await fetch('http://localhost:5000/api/alerts/history?limit=50', {
+        const response = await fetch(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/alerts/history?limit=50', {
           credentials: 'include'
         });
         const data = await response.json();

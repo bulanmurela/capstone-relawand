@@ -32,7 +32,7 @@ export function AlertProvider({ children }: { children: ReactNode }) {
 
     // Save alert to backend as viewed
     try {
-      await fetch('http://localhost:5000/api/alerts/mark-viewed', {
+      await fetch(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/alerts/mark-viewed', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

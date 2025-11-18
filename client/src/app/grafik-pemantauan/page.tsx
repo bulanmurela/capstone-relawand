@@ -21,8 +21,8 @@ export default function GrafikPemantauanPage() {
         // Check if in demo mode
         const demoMode = localStorage.getItem('demoMode') === 'true';
         const url = demoMode
-          ? "http://localhost:5000/devices?isDemo=true"
-          : "http://localhost:5000/devices?isDemo=false";
+          ? process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/devices?isDemo=true"
+          : process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/devices?isDemo=false";
 
         const res = await fetch(url, {
           credentials: "include",
@@ -49,7 +49,7 @@ export default function GrafikPemantauanPage() {
   useEffect(() => {
     const fetchDevice = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/devices/${deviceId}`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/devices/${deviceId}`, {
           credentials: "include",
         });
         if (!res.ok) throw new Error("Failed to fetch device");

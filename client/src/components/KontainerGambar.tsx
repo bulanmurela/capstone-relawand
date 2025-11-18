@@ -21,7 +21,7 @@ export default function ForestCamera({ locationId }: Props) {
       await new Promise(resolve => setTimeout(resolve, 1500));
       
       // TODO: Replace with actual API call to camera
-      // const response = await fetch('http://localhost:5000/api/camera/capture', {
+      // const response = await fetch(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/camera/capture', {
       //   method: 'POST',
       //   credentials: 'include'
       // });

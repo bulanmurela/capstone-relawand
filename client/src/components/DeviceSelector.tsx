@@ -21,7 +21,7 @@ export default function DeviceSelector({ selectedId, onSelect }: DeviceSelectorP
   useEffect(() => {
     // TODO: Fetch from API
     // const fetchLocations = async () => {
-    //   const response = await fetch('http://localhost:5000/api/locations', {
+    //   const response = await fetch(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/locations', {
     //     credentials: 'include'
     //   });
     //   const data = await response.json();
