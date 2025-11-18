@@ -3,8 +3,8 @@
 import mqtt from 'mqtt';
 
 // Configuration
-const MQTT_BROKER = process.env.MQTT_BROKER || 'broker.emqx.io';
-const MQTT_TOPIC = process.env.MQTT_TOPIC || 'Relawand';
+const MQTT_BROKER = process.env.MQTT_BROKER || '103.197.188.247';
+const MQTT_TOPIC = process.env.MQTT_TOPIC || 'Relawand_F01/sensor/data';
 const MQTT_PORT = parseInt(process.env.MQTT_PORT || '8084', 10);
 
 console.log('╔═══════════════════════════════════════════════════════════╗');

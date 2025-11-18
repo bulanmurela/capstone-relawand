@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import mqtt from 'mqtt';
 
-const MQTT_BROKER = process.env.MQTT_BROKER || 'broker.emqx.io';
+const MQTT_BROKER = process.env.MQTT_BROKER || '103.197.188.247';
 const MQTT_PORT = parseInt(process.env.MQTT_PORT || '1883', 10);
 
 // Publish MQTT message
