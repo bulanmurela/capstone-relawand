@@ -9,6 +9,7 @@ interface MqttContextValue {
   isConnected: boolean;
   error: string | null;
   lastUpdate: Date | null;
+  WarningComponent: React.ReactNode;
 }
 
 const MqttContext = createContext<MqttContextValue | undefined>(undefined);
@@ -84,6 +85,7 @@ export function MqttProvider({ children, enabled = true }: MqttProviderProps) {
   return (
     <MqttContext.Provider value={mqttState}>
       {children}
+      {mqttState.WarningComponent}
     </MqttContext.Provider>
   );
 }
