@@ -20,6 +20,7 @@ import loginRoute from './routes/loginRoute';
 import deviceRoute from './routes/deviceRoute';
 import mqttLogRoute from './routes/mqttLogRoute';
 import mqttRoute from './routes/mqttRoute';
+import webhookRoute from './routes/webhookRoute';
 
 dotenv.config();
 
@@ -92,6 +93,11 @@ app.use('/api/alerts', alertLogRoutes);
 app.use('/api/sensor-data', sensorDataRoute);
 app.use('/api/mqtt-logs', mqttLogRoute);
 app.use('/api/mqtt', mqttRoute);
+app.use('/api/webhook', webhookRoute);
+
+// Static file serving for uploaded images
+const UPLOAD_DIR = process.env.UPLOAD_DIR || '/var/www/relawand/uploads';
+app.use('/uploads', express.static(UPLOAD_DIR));
 
 // Health check
 app.get('/api/health', (req, res) => {
