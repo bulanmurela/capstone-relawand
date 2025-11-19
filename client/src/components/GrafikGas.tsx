@@ -20,7 +20,7 @@ export default function GasConcentrationChart({ locationId }: Props ) {
   const [currentGasPPM, setCurrentGasPPM] = useState(0);
   const [currentVoltage, setCurrentVoltage] = useState(0);
   const [currentAlarm, setCurrentAlarm] = useState(false);
-  const [timeRange, setTimeRange] = useState<number>(24); // hours
+  const [timeRange, setTimeRange] = useState<number>(72); // hours - increased to 3 days to find older data
 
   // Real-time updates via MQTT
   const { data: mqttData, isConnected } = useMqttContext();
@@ -31,13 +31,16 @@ export default function GasConcentrationChart({ locationId }: Props ) {
     const fetchData = async () => {
       try {
         // Fetch data based on time range
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/sensor-data/${locationId}?hours=${timeRange}`,
-          { credentials: 'include' }
-        );
+        const url = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/sensor-data/${locationId}?hours=${timeRange}`;
+        console.log('Fetching gas data from:', url);
+
+        const response = await fetch(url, { credentials: 'include' });
+
+        console.log('Gas data response status:', response.status);
 
         if (response.ok) {
           const apiData = await response.json();
+          console.log('Received gas data:', apiData.length, 'records');
 
           // Transform to chart format
           const chartData = apiData.map((item: {

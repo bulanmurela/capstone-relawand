@@ -18,7 +18,7 @@ export default function TemperatureHumidityChart({ locationId }: Props) {
   const [data, setData] = useState<ChartData[]>([]);
   const [currentTemp, setCurrentTemp] = useState(0);
   const [currentHumidity, setCurrentHumidity] = useState(0);
-  const [timeRange, setTimeRange] = useState<number>(24); // hours
+  const [timeRange, setTimeRange] = useState<number>(72); // hours - increased to 3 days to find older data
 
   // Real-time updates via MQTT
   const { data: mqttData, isConnected } = useMqttContext();
@@ -29,13 +29,16 @@ export default function TemperatureHumidityChart({ locationId }: Props) {
     const fetchData = async () => {
       try {
         // Fetch data based on time range
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/sensor-data/${locationId}?hours=${timeRange}`,
-          { credentials: 'include' }
-        );
+        const url = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/sensor-data/${locationId}?hours=${timeRange}`;
+        console.log('Fetching sensor data from:', url);
+
+        const response = await fetch(url, { credentials: 'include' });
+
+        console.log('Response status:', response.status);
 
         if (response.ok) {
           const apiData = await response.json();
+          console.log('Received sensor data:', apiData.length, 'records');
 
           // Transform to chart format
           const chartData = apiData.map((item: {
