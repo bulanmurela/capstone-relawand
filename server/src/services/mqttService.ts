@@ -135,6 +135,14 @@ class MqttService {
         data.timestamp = new Date();
       }
 
+      // Add default values for missing required fields to prevent database validation errors
+      if (!data.gas_adc) {
+        data.gas_adc = 0;
+      }
+      if (!data.voltage) {
+        data.voltage = 0;
+      }
+
       // Save all sensor data (temperature and humidity can be null)
       await this.saveSensorData(deviceId, data);
 
