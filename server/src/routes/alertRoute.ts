@@ -114,7 +114,7 @@ router.post('/mark-viewed', authMiddleware, async (req, res) => {
 
     // Create a new alert entry marked as viewed
     const alert = await Alert.create({
-      deviceId: device?._id || deviceId,
+      deviceId: device?._id || deviceId, // Use device._id if found, otherwise use string deviceId
       deviceName: deviceName || device?.deviceName || deviceId,
       level,
       temperature: temperature || 0,
