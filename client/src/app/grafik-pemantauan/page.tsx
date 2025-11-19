@@ -40,7 +40,7 @@ function GrafikPemantauanContent() {
         const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
         const url = demoMode
           ? `${baseUrl}/devices?isDemo=true`
-          : `${baseUrl}/devices?isDemo=false`;
+          : `${baseUrl}/devices`; // Don't filter by isDemo when not in demo mode
 
         const res = await fetch(url, {
           credentials: "include",
