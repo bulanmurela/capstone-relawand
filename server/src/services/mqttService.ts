@@ -136,11 +136,17 @@ class MqttService {
       }
 
       // Add default values for missing required fields to prevent database validation errors
-      if (!data.gas_adc) {
+      if (data.gas_adc === undefined || data.gas_adc === null) {
         data.gas_adc = 0;
       }
-      if (!data.voltage) {
+      if (data.gas_ppm === undefined || data.gas_ppm === null) {
+        data.gas_ppm = 0;
+      }
+      if (data.voltage === undefined || data.voltage === null) {
         data.voltage = 0;
+      }
+      if (data.alarm === undefined || data.alarm === null) {
+        data.alarm = false;
       }
 
       // Save all sensor data (temperature and humidity can be null)
