@@ -13,6 +13,7 @@ interface MqttSensorData {
   voltage: number;
   alarm: boolean;
   device_id?: string;
+  timestamp?: Date;
 }
 
 interface MqttServiceOptions {
