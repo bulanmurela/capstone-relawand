@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { useMqttContext } from '@/contexts/MqttContext';
 
@@ -38,7 +38,11 @@ export default function TemperatureHumidityChart({ locationId }: Props) {
           const apiData = await response.json();
 
           // Transform to chart format
-          const chartData = apiData.map((item: any) => ({
+          const chartData = apiData.map((item: {
+            timestamp: string | Date;
+            temperature?: number;
+            humidity?: number;
+          }) => ({
             time: new Date(item.timestamp).toLocaleTimeString('id-ID', {
               hour: '2-digit',
               minute: '2-digit',
@@ -162,7 +166,7 @@ export default function TemperatureHumidityChart({ locationId }: Props) {
                   borderRadius: '8px'
                 }}
                 labelFormatter={(value) => `Waktu: ${value}`}
-                formatter={(value: any, name: string) => {
+                formatter={(value: number | string, name: string) => {
                   if (name === 'Suhu (°C)') return [`${value}°C`, name];
                   if (name === 'Kelembapan (%)') return [`${value}%`, name];
                   return [value, name];

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { useMqttContext } from '@/contexts/MqttContext';
 
@@ -40,7 +40,13 @@ export default function GasConcentrationChart({ locationId }: Props ) {
           const apiData = await response.json();
 
           // Transform to chart format
-          const chartData = apiData.map((item: any) => ({
+          const chartData = apiData.map((item: {
+            timestamp: string | Date;
+            gas_ppm?: number;
+            gas_adc?: number;
+            voltage?: number;
+            alarm?: boolean;
+          }) => ({
             time: new Date(item.timestamp).toLocaleTimeString('id-ID', {
               hour: '2-digit',
               minute: '2-digit',
@@ -169,7 +175,7 @@ export default function GasConcentrationChart({ locationId }: Props ) {
                   borderRadius: '8px'
                 }}
                 labelFormatter={(value) => `Waktu: ${value}`}
-                formatter={(value: any, name: string) => [`${value} ppm`, name]}
+                formatter={(value: number | string, name: string) => [`${value} ppm`, name]}
               />
               <Legend
                 wrapperStyle={{ bottom: 0, paddingTop: '2px' }}

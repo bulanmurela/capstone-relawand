@@ -41,7 +41,15 @@ export default function CommunicationLog() {
       const data = await response.json();
 
       if (data.success && data.logs) {
-        const transformedLogs = data.logs.map((log: any) => ({
+        const transformedLogs = data.logs.map((log: {
+          _id: string;
+          timestamp: string | Date;
+          deviceId: string;
+          deviceName: string;
+          type: 'SENT' | 'RECEIVED';
+          payload: string;
+          status: 'success' | 'error';
+        }) => ({
           id: log._id,
           timestamp: formatTimestamp(log.timestamp),
           deviceId: log.deviceId,

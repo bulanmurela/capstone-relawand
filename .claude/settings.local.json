@@ -27,7 +27,17 @@
       "Bash(npx tsc:*)",
       "Bash(find:*)",
       "Bash(npm run db:count-sensors:*)",
-      "Bash(node -e:*)"
+      "Bash(node -e:*)",
+      "Bash(ssh:*)",
+      "Bash(xargs sed:*)",
+      "Bash(git checkout:*)",
+      "Bash(git restore:*)",
+      "Bash(jobs:*)",
+      "Bash(convert:*)",
+      "Bash(xargs:*)",
+      "Bash(python3:*)",
+      "Bash(chmod:*)",
+      "Bash(/home/izcy/Desktop/UGM/CPSTN/capstone-relawand/scripts/check-uploaded-images.sh:*)"
     ],
     "deny": [],
     "ask": []

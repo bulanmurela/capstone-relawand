@@ -6,12 +6,29 @@ import GrafikTempHum from "@/components/GrafikTempHum";
 import GrafikGas from "@/components/GrafikGas";
 import KontainerGambar from "@/components/KontainerGambar";
 
+interface Device {
+  _id: string;
+  deviceName: string;
+  deviceType: string;
+  location?: {
+    latitude?: number;
+    longitude?: number;
+    address?: string;
+  };
+  statusDevice?: string;
+  // Legacy fields for backward compatibility
+  name?: string;
+  status?: string;
+  latitude?: number;
+  longitude?: number;
+}
+
 export default function GrafikPemantauanPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const deviceId = searchParams.get("deviceId");
-  const [device, setDevice] = useState<any>(null);
-  const [devices, setDevices] = useState<any[]>([]);
+  const [device, setDevice] = useState<Device | null>(null);
+  const [devices, setDevices] = useState<Device[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedDeviceId, setSelectedDeviceId] = useState<string>("");
 

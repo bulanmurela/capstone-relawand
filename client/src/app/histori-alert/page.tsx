@@ -78,7 +78,16 @@ export default function HistoriPeringatanPage() {
 
         if (data.success && data.alerts) {
           // Transform alerts to match the expected format
-          const transformedAlerts = data.alerts.map((alert: any) => {
+          const transformedAlerts = data.alerts.map((alert: {
+            _id: string;
+            level: string;
+            deviceName: string;
+            temperature: number;
+            humidity: number;
+            gasConcentration: number;
+            viewedAt?: string | Date;
+            timestamp: string | Date;
+          }) => {
             const { date, time } = formatDateTime(alert.viewedAt || alert.timestamp);
             return {
               id: alert._id,

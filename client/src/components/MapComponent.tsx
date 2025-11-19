@@ -1,14 +1,14 @@
 "use client";
 
 import { MapContainer, TileLayer, Marker, Popup, useMap, useMapEvents } from "react-leaflet";
-import L, { Icon, LatLng } from "leaflet";
+import L, { Icon } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useRouter } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import React from "react";
 import { useNotification } from "@/contexts/NotificationContext";
 
-delete (L.Icon.Default.prototype as any)._getIconUrl;
+delete (L.Icon.Default.prototype as L.Icon.Default & { _getIconUrl?: unknown })._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
   iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
@@ -61,6 +61,11 @@ interface Device {
     statusDevice: string;
     userId?: string;
     isActive: boolean;
+    // Legacy fields for backward compatibility
+    latitude?: number;
+    longitude?: number;
+    name?: string;
+    status?: string;
 }
 
 export type MapProps = {
@@ -311,9 +316,9 @@ export default function MapComponent() {
 
         try {
             // Get current device data
-            const lat = editingDevice.location?.latitude ?? (editingDevice as any).latitude;
-            const lon = editingDevice.location?.longitude ?? (editingDevice as any).longitude;
-            const deviceName = editingDevice.deviceName || (editingDevice as any).name;
+            const lat = editingDevice.location?.latitude ?? editingDevice.latitude;
+            const lon = editingDevice.location?.longitude ?? editingDevice.longitude;
+            const deviceName = editingDevice.deviceName || editingDevice.name;
 
             // Send in frontend format that the route expects
             const updateData = {
@@ -357,7 +362,7 @@ export default function MapComponent() {
     const handleMarkerRightClick = (device: Device) => {
         if (mode === 'select') {
             setEditingDevice(device);
-            const currentStatus = (device as any).status || device.statusDevice || 'offline';
+            const currentStatus = device.status || device.statusDevice || 'offline';
             setNewStatus(currentStatus);
         }
     };
@@ -446,9 +451,9 @@ export default function MapComponent() {
 
                 {/* Existing device markers */}
                 {deviceList.map((device) => {
-                    const lat = device.location?.latitude ?? (device as any).latitude;
-                    const lon = device.location?.longitude ?? (device as any).longitude;
-                    const name = device.deviceName || (device as any).name;
+                    const lat = device.location?.latitude ?? device.latitude;
+                    const lon = device.location?.longitude ?? device.longitude;
+                    const name = device.deviceName || device.name;
 
                     if (!lat || !lon) return null;
 
@@ -470,9 +475,9 @@ export default function MapComponent() {
                                     <div className="font-semibold">{name}</div>
                                     <div className="text-xs">
                                         Status: <span className={`font-semibold ${
-                                            ((device as any).status || device.statusDevice) === 'online' ? 'text-green-600' :
-                                            ((device as any).status || device.statusDevice) === 'error' ? 'text-red-600' : 'text-gray-600'
-                                        }`}>{(device as any).status || device.statusDevice || 'unknown'}</span>
+                                            (device.status || device.statusDevice) === 'online' ? 'text-green-600' :
+                                            (device.status || device.statusDevice) === 'error' ? 'text-red-600' : 'text-gray-600'
+                                        }`}>{device.status || device.statusDevice || 'unknown'}</span>
                                     </div>
                                     {mode === 'select' && (
                                         <>
@@ -614,7 +619,7 @@ export default function MapComponent() {
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]">
                     <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
                         <h3 className="text-xl font-bold mb-4" style={{ fontFamily: 'Nunito, sans-serif' }}>
-                            Edit Status: {editingDevice.deviceName || (editingDevice as any).name}
+                            Edit Status: {editingDevice.deviceName || editingDevice.name}
                         </h3>
                         <div className="mb-4">
                             <label className="block text-sm font-semibold mb-2" style={{ fontFamily: 'Nunito, sans-serif' }}>
