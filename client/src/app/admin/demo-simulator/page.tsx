@@ -73,7 +73,7 @@ export default function DemoSimulatorPage() {
   const fetchDemoDevices = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/devices?isDemo=true', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/devices?isDemo=true`, {
         credentials: 'include'
       });
 
@@ -113,7 +113,7 @@ export default function DemoSimulatorPage() {
         alarm: values.alarm
       };
 
-      const response = await fetch(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/mqtt/publish', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/mqtt/publish`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

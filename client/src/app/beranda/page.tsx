@@ -48,7 +48,7 @@ export default function Beranda() {
     // Check authentication with backend
     const checkAuth = async () => {
       try {
-        const response = await fetch(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/login/check', {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/login/check`, {
           method: 'GET',
           credentials: 'include',
         });

@@ -35,7 +35,7 @@ export default function CommunicationLog() {
   // Fetch logs from API
   const fetchLogs = async () => {
     try {
-      const response = await fetch(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/mqtt-logs?limit=100', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/mqtt-logs?limit=100`, {
         credentials: 'include'
       });
       const data = await response.json();
