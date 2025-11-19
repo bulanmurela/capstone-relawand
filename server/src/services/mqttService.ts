@@ -129,6 +129,11 @@ class MqttService {
       }
       deviceName = device?.deviceName || deviceId;
 
+      // Add current timestamp if missing
+      if (!data.timestamp) {
+        data.timestamp = new Date();
+      }
+
       // Save all sensor data (temperature and humidity can be null)
       await this.saveSensorData(deviceId, data);
 

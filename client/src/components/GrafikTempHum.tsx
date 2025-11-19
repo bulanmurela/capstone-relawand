@@ -18,7 +18,7 @@ export default function TemperatureHumidityChart({ locationId }: Props) {
   const [data, setData] = useState<ChartData[]>([]);
   const [currentTemp, setCurrentTemp] = useState(0);
   const [currentHumidity, setCurrentHumidity] = useState(0);
-  const [timeRange, setTimeRange] = useState<number>(72); // hours - increased to 3 days to find older data
+  const [timeRange, setTimeRange] = useState<number>(1); // hours - real-time monitoring (1 hour window)
 
   // Real-time updates via MQTT
   const { data: mqttData, isConnected } = useMqttContext();

@@ -20,7 +20,7 @@ export default function GasConcentrationChart({ locationId }: Props ) {
   const [currentGasPPM, setCurrentGasPPM] = useState(0);
   const [currentVoltage, setCurrentVoltage] = useState(0);
   const [currentAlarm, setCurrentAlarm] = useState(false);
-  const [timeRange, setTimeRange] = useState<number>(72); // hours - increased to 3 days to find older data
+  const [timeRange, setTimeRange] = useState<number>(1); // hours - real-time monitoring (1 hour window)
 
   // Real-time updates via MQTT
   const { data: mqttData, isConnected } = useMqttContext();
