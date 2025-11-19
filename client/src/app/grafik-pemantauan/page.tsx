@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import GrafikTempHum from "@/components/GrafikTempHum";
 import GrafikGas from "@/components/GrafikGas";
@@ -23,7 +23,7 @@ interface Device {
   longitude?: number;
 }
 
-export default function GrafikPemantauanPage() {
+function GrafikPemantauanContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const deviceId = searchParams.get("deviceId");
@@ -182,5 +182,17 @@ export default function GrafikPemantauanPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function GrafikPemantauanPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center min-h-screen text-[#567C8D] text-xl">
+        Memuat halaman...
+      </div>
+    }>
+      <GrafikPemantauanContent />
+    </Suspense>
   );
 }
