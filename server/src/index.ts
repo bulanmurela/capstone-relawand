@@ -42,7 +42,7 @@ app.use(cors({
     'http://localhost:3000',
     'https://relawand-capstone.izcy.tech',
     'https://capstone-relawand.izcy.tech',
-    'https://api.relawand-capstone.izcy.tech'
+    'https://api-relawand.izcy.tech'
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
