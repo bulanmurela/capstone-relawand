@@ -126,7 +126,7 @@ class MqttService {
           }
         }
       }
-      deviceName = device?.deviceName || device?.name || deviceId;
+      deviceName = device?.deviceName || deviceId;
 
       // Save all sensor data (temperature and humidity can be null)
       await this.saveSensorData(deviceId, data);
