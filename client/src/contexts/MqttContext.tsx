@@ -59,7 +59,7 @@ export function MqttProvider({ children, enabled = true }: MqttProviderProps) {
   const { showAlert } = useAlert();
   const lastAlertTime = useRef<number>(0);
   const ALERT_COOLDOWN = 60000; // 1 minute cooldown between alerts
-  const [devices, setDevices] = useState<Array<{deviceId: string, deviceName: string}>>([]);
+  const [devices, setDevices] = useState<Array<{deviceId: string, mongoId?: string, deviceName: string}>>([]);
 
   // Fetch devices to map device_id to deviceName
   useEffect(() => {
