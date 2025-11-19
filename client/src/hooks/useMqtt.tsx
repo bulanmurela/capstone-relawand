@@ -35,6 +35,8 @@ export function useMqtt(options: UseMqttOptions = {}): UseMqttReturn {
     enabled = true
   } = options;
 
+  const path = process.env.NEXT_PUBLIC_MQTT_PATH || '/';
+
   const [data, setData] = useState<MqttSensorData | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -49,9 +51,10 @@ export function useMqtt(options: UseMqttOptions = {}): UseMqttReturn {
     }
 
     try {
-      console.log('[MQTT Client] Connecting to:', `wss://${broker}:${port}`);
+      const mqttUrl = `wss://${broker}:${port}${path}`;
+      console.log('[MQTT Client] Connecting to:', mqttUrl);
 
-      const client = mqtt.connect(`wss://${broker}:${port}`, {
+      const client = mqtt.connect(mqttUrl, {
         clientId: `relawand_client_${Math.random().toString(16).substring(2, 8)}`,
         clean: true,
         connectTimeout: 10000,
@@ -128,7 +131,7 @@ export function useMqtt(options: UseMqttOptions = {}): UseMqttReturn {
         connect();
       }, 5000);
     }
-  }, [broker, port, topic, enabled]);
+  }, [broker, port, path, topic, enabled]);
 
   useEffect(() => {
     if (enabled) {
@@ -146,7 +149,7 @@ export function useMqtt(options: UseMqttOptions = {}): UseMqttReturn {
         clientRef.current = null;
       }
     };
-  }, [connect, enabled, broker, port]);
+  }, [connect, enabled, broker, port, path]);
 
   return {
     data,
