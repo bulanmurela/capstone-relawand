@@ -25,12 +25,14 @@ export const getSensorData = async (req: Request, res: Response) => {
     // Build query
     const query: any = { deviceId: actualDeviceId };
 
-    // Use isDemo from query parameter if provided, otherwise use device's isDemo flag
+    // Only filter by isDemo if explicitly requested OR if device is a demo device
     if (isDemo !== undefined) {
       query.isDemo = isDemo === 'true';
-    } else {
-      query.isDemo = deviceIsDemo;
+    } else if (deviceIsDemo === true) {
+      // Only add isDemo filter if device is explicitly a demo device
+      query.isDemo = true;
     }
+    // If deviceIsDemo is false or undefined, don't add isDemo filter at all
 
     let data;
 
@@ -92,12 +94,14 @@ export const getLatestSensorData = async (req: Request, res: Response) => {
     // Build query
     const query: any = { deviceId: actualDeviceId };
 
-    // Use isDemo from query parameter if provided, otherwise use device's isDemo flag
+    // Only filter by isDemo if explicitly requested OR if device is a demo device
     if (isDemo !== undefined) {
       query.isDemo = isDemo === 'true';
-    } else {
-      query.isDemo = deviceIsDemo;
+    } else if (deviceIsDemo === true) {
+      // Only add isDemo filter if device is explicitly a demo device
+      query.isDemo = true;
     }
+    // If deviceIsDemo is false or undefined, don't add isDemo filter at all
 
     const latest = await SensorData.findOne(query)
       .sort({ timestamp: -1 })
