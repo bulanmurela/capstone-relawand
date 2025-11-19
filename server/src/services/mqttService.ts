@@ -112,9 +112,21 @@ class MqttService {
       // Update device heartbeat and status
       await this.updateDeviceStatus(deviceId);
 
-      // Get device name for logging
-      const device = await Device.findOne({ deviceId });
-      deviceName = device?.deviceName || deviceId;
+      // Get device name for logging - check both deviceId field and _id field
+      let device = null;
+      if (deviceId) {
+        // First try to find by deviceId field (e.g., "STM32-001")
+        device = await Device.findOne({ deviceId });
+        // If not found, try to find by MongoDB _id
+        if (!device) {
+          try {
+            device = await Device.findById(deviceId);
+          } catch (err) {
+            // deviceId might not be a valid ObjectId, continue with fallback
+          }
+        }
+      }
+      deviceName = device?.deviceName || device?.name || deviceId;
 
       // Save all sensor data (temperature and humidity can be null)
       await this.saveSensorData(deviceId, data);
@@ -149,7 +161,16 @@ class MqttService {
 
   private async updateDeviceStatus(deviceId: string) {
     try {
-      const device = await Device.findOne({ deviceId });
+      let device = await Device.findOne({ deviceId });
+
+      // If not found by deviceId field, try to find by MongoDB _id
+      if (!device) {
+        try {
+          device = await Device.findById(deviceId);
+        } catch (err) {
+          // deviceId might not be a valid ObjectId, continue with fallback
+        }
+      }
 
       if (device) {
         device.statusDevice = 'online';
