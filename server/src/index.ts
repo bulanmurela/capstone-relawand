@@ -75,7 +75,7 @@ app.use(session({
 }));
 
 // Routes
-app.use('/login', loginRoute);
+app.use('/api/login', loginRoute);
 
 // FIXED: Add API auth routes that map to login controller
 app.get('/api/auth/check', (req, res, next) => {
