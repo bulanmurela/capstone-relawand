@@ -80,9 +80,11 @@ export function useMqtt(options: UseMqttOptions = {}): UseMqttReturn {
       client.on('message', (_topic, payload) => {
         try {
           const parsedData: MqttSensorData = JSON.parse(payload.toString());
+          // Force device_id to the specific MongoDB ID since MQTT data doesn't include it
+          parsedData.device_id = '6908864feefad0e348b4f6ee';
           setData(parsedData);
           setLastUpdate(new Date());
-          console.log('[MQTT Client] 📩 Data received:', parsedData);
+          console.log('[MQTT Client] 📩 Data received with device_id:', parsedData.device_id);
         } catch (err) {
           console.error('[MQTT Client] ❌ Parse error:', err);
         }
