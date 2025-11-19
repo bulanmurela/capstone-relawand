@@ -37,7 +37,8 @@
       "Bash(xargs:*)",
       "Bash(python3:*)",
       "Bash(chmod:*)",
-      "Bash(/home/izcy/Desktop/UGM/CPSTN/capstone-relawand/scripts/check-uploaded-images.sh:*)"
+      "Bash(/home/izcy/Desktop/UGM/CPSTN/capstone-relawand/scripts/check-uploaded-images.sh:*)",
+      "Bash(dig:*)"
     ],
     "deny": [],
     "ask": []
