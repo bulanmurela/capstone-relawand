@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, ReactNode, useEffect, useRef } from 'react';
+import React, { createContext, useContext, ReactNode, useEffect, useRef, useState } from 'react';
 import { useMqtt, MqttSensorData } from '../hooks/useMqtt';
 import { useAlert } from './AlertContexts';
 
@@ -59,6 +59,35 @@ export function MqttProvider({ children, enabled = true }: MqttProviderProps) {
   const { showAlert } = useAlert();
   const lastAlertTime = useRef<number>(0);
   const ALERT_COOLDOWN = 60000; // 1 minute cooldown between alerts
+  const [devices, setDevices] = useState<Array<{deviceId: string, deviceName: string}>>([]);
+
+  // Fetch devices to map device_id to deviceName
+  useEffect(() => {
+    const fetchDevices = async () => {
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/devices`, {
+          credentials: 'include'
+        });
+        if (response.ok) {
+          const deviceList = await response.json();
+          const deviceMap = deviceList.map((device: any) => ({
+            deviceId: device.deviceId,
+            deviceName: device.name || device.deviceName || 'Unknown Device'
+          }));
+          setDevices(deviceMap);
+        }
+      } catch (error) {
+        console.error('Error fetching devices for alert mapping:', error);
+      }
+    };
+    fetchDevices();
+  }, []);
+
+  // Helper function to get device name by device_id
+  const getDeviceName = (deviceId: string): string => {
+    const device = devices.find(d => d.deviceId === deviceId);
+    return device?.deviceName || deviceId || 'Unknown Device';
+  };
 
   // Check for alerts when new data arrives
   useEffect(() => {
@@ -69,17 +98,18 @@ export function MqttProvider({ children, enabled = true }: MqttProviderProps) {
       // Only show alert if level is SIAGA or DARURAT and cooldown has passed
       if (alertLevel && alertLevel !== 'NORMAL' && (now - lastAlertTime.current) > ALERT_COOLDOWN) {
         lastAlertTime.current = now;
+        const deviceName = getDeviceName(mqttState.data.device_id || '');
         showAlert({
           level: alertLevel,
           deviceId: mqttState.data.device_id,
-          deviceName: mqttState.data.device_id || 'Unknown Device',
+          deviceName: deviceName,
           temperature: mqttState.data.temperature || 0,
           humidity: mqttState.data.humidity || 0,
           gasConcentration: mqttState.data.gas_ppm || 0
         });
       }
     }
-  }, [mqttState.data, showAlert]);
+  }, [mqttState.data, showAlert, devices]);
 
   return (
     <MqttContext.Provider value={mqttState}>
