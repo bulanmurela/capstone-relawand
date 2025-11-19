@@ -131,9 +131,10 @@ export default function MapComponent() {
     try {
         // Check if in demo mode
         const demoMode = localStorage.getItem('demoMode') === 'true';
+        const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
         const url = demoMode
-            ? process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/devices?isDemo=true"
-            : process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/devices?isDemo=false";
+            ? `${baseUrl}/devices?isDemo=true`
+            : `${baseUrl}/devices?isDemo=false`;
 
         const response = await fetch(url, {
         method: "GET",
@@ -228,7 +229,7 @@ export default function MapComponent() {
                 console.log('Creating device:', newDevice);
                 console.log('Marker data:', marker);
 
-                const response = await fetch(process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/devices", {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/devices`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     credentials: 'include',

@@ -37,9 +37,10 @@ function GrafikPemantauanContent() {
       try {
         // Check if in demo mode
         const demoMode = localStorage.getItem('demoMode') === 'true';
+        const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
         const url = demoMode
-          ? process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/devices?isDemo=true"
-          : process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/devices?isDemo=false";
+          ? `${baseUrl}/devices?isDemo=true`
+          : `${baseUrl}/devices?isDemo=false`;
 
         const res = await fetch(url, {
           credentials: "include",
