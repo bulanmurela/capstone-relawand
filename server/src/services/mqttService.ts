@@ -106,8 +106,9 @@ class MqttService {
         console.log(`[MQTT] 📩 Received: ${message.substring(0, 100)}`);
       }
 
-      // Extract device ID from message or use default
-      deviceId = data.device_id || this.options.defaultDeviceId!;
+      // Force all MQTT messages to use the specific device ID
+      deviceId = '6908864feefad0e348b4f6ee';  // Force to RelaWand 1 device
+      console.log(`[MQTT] 📌 Forcing device ID to: ${deviceId}`);
 
       // Update device heartbeat and status
       await this.updateDeviceStatus(deviceId);

@@ -70,9 +70,11 @@ export function MqttProvider({ children, enabled = true }: MqttProviderProps) {
         });
         if (response.ok) {
           const deviceList = await response.json();
-          const deviceMap = deviceList.map((device: {deviceId?: string, deviceName?: string, name?: string}) => ({
+          const deviceMap = deviceList.map((device: {_id?: string, deviceId?: string, deviceName?: string, name?: string}) => ({
+            // Map both _id and deviceId for lookup
             deviceId: device.deviceId,
-            deviceName: device.name || device.deviceName || 'Unknown Device'
+            mongoId: device._id,
+            deviceName: device.name || device.deviceName || device.deviceId || 'Unknown Device'
           }));
           setDevices(deviceMap);
         }
@@ -83,9 +85,9 @@ export function MqttProvider({ children, enabled = true }: MqttProviderProps) {
     fetchDevices();
   }, []);
 
-  // Helper function to get device name by device_id
+  // Helper function to get device name by device_id (check both deviceId and mongoId)
   const getDeviceName = useCallback((deviceId: string): string => {
-    const device = devices.find(d => d.deviceId === deviceId);
+    const device = devices.find(d => d.deviceId === deviceId || d.mongoId === deviceId);
     return device?.deviceName || deviceId || 'Unknown Device';
   }, [devices]);
 
