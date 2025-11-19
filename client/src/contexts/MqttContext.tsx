@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, ReactNode, useEffect, useRef, useState } from 'react';
+import React, { createContext, useContext, ReactNode, useEffect, useRef, useState, useCallback } from 'react';
 import { useMqtt, MqttSensorData } from '../hooks/useMqtt';
 import { useAlert } from './AlertContexts';
 
@@ -70,7 +70,7 @@ export function MqttProvider({ children, enabled = true }: MqttProviderProps) {
         });
         if (response.ok) {
           const deviceList = await response.json();
-          const deviceMap = deviceList.map((device: any) => ({
+          const deviceMap = deviceList.map((device: {deviceId?: string, deviceName?: string, name?: string}) => ({
             deviceId: device.deviceId,
             deviceName: device.name || device.deviceName || 'Unknown Device'
           }));
@@ -84,10 +84,10 @@ export function MqttProvider({ children, enabled = true }: MqttProviderProps) {
   }, []);
 
   // Helper function to get device name by device_id
-  const getDeviceName = (deviceId: string): string => {
+  const getDeviceName = useCallback((deviceId: string): string => {
     const device = devices.find(d => d.deviceId === deviceId);
     return device?.deviceName || deviceId || 'Unknown Device';
-  };
+  }, [devices]);
 
   // Check for alerts when new data arrives
   useEffect(() => {
@@ -109,7 +109,7 @@ export function MqttProvider({ children, enabled = true }: MqttProviderProps) {
         });
       }
     }
-  }, [mqttState.data, showAlert, devices]);
+  }, [mqttState.data, showAlert, getDeviceName]);
 
   return (
     <MqttContext.Provider value={mqttState}>
